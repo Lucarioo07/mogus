@@ -45,6 +45,8 @@ class Game(commands.Cog):
   async def challenge(self, ctx, opponent: discord.Member, reloads=0, saiyan = 0):
 
       global message, embed
+      sender = ctx.author
+      
       challenge_embed = discord.Embed(
         title= f"You have been challenged to a battle by {ctx.author.name}",
         description= "Do you accept or not?",

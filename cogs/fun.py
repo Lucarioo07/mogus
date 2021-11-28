@@ -15,9 +15,28 @@ class Fun(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, ctx):
+
         snipe_target = db["snipe_target"]
         if ctx.author.id in snipe_target:
             send_webhook(ctx.content, ctx.author, await fetch_webhook(ctx.channel))
+
+    @commands.Cog.listener()
+    async def on_message(self, ctx):
+
+      if str(ctx.guild.id) in db['dadjoke']:
+          if ctx.content.find("im") != -1:
+            index = ctx.content.find("im") + 3
+          elif ctx.content.find("i'm")!= -1:
+            index = ctx.content.find("i'm") + 4
+          elif ctx.content.find("i am") != -1:
+            index = ctx.content.find("i am") + 5
+          
+          try:
+            sub = ctx.content[index:]
+            await ctx.reply(f"hey {sub}")
+          except:
+            pass
+
 
 
     # Commands
