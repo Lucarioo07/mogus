@@ -48,11 +48,28 @@ async def fetch_webhook(channel: discord.TextChannel):
     return webhook
 
 
-def send_webhook(content, user, hook):
+def frame(content, user, hook):
     data = {
         "content": content,
         "username": user.name,
         "avatar_url": str(user.avatar_url),
+        "allowed_mentions": {
+            "parse": []
+        }
+    }
+
+    result = requests.post(hook.url, json=data)
+
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+
+def send_webhook(content, name, avatar, hook):
+    data = {
+        "content": content,
+        "username": name,
+        "avatar_url": str(avatar),
         "allowed_mentions": {
             "parse": []
         }

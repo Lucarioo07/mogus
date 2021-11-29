@@ -18,18 +18,26 @@ class Fun(commands.Cog):
 
         snipe_target = db["snipe_target"]
         if ctx.author.id in snipe_target:
-            send_webhook(ctx.content, ctx.author, await fetch_webhook(ctx.channel))
+            send_webhook(ctx.content, f"{ctx.author.name} (snipe)", ctx.author.avatar_url, await fetch_webhook(ctx.channel))
+    
+    @commands.Cog.listener()
+    async def on_message_edit(self, ctx, after):
+
+        snipe_target = db["snipe_target"]
+        if ctx.author.id in snipe_target:
+            send = f"> [{after.content}]({after.jump_url}) \n **Before:** `{ctx.content}`"
+            send_webhook(send, f"{ctx.author.name} (editsnipe)", ctx.author.avatar_url, await fetch_webhook(ctx.channel))
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
 
-      if str(ctx.guild.id) in db['dadjoke']:
-          if ctx.content.find("im") != -1:
-            index = ctx.content.find("im") + 3
-          elif ctx.content.find("i'm")!= -1:
-            index = ctx.content.find("i'm") + 4
-          elif ctx.content.find("i am") != -1:
-            index = ctx.content.find("i am") + 5
+      if ctx.guild.id in db['dadjoke'] and ctx.author.id != 888373479655751700:
+          if ctx.content.find("im ") != -1:
+            index = ctx.content.find("im ") + 3
+          elif ctx.content.find("i'm ")!= -1:
+            index = ctx.content.find("i'm ") + 4
+          elif ctx.content.find("i am ") != -1:
+            index = ctx.content.find("i am ") + 5
           
           try:
             sub = ctx.content[index:]
@@ -50,9 +58,9 @@ class Fun(commands.Cog):
                 (user.id not in safe) and (ctx.author.id not in banned)):
             if content != "":
               
-              send_webhook(content, user, await fetch_webhook(ctx.channel))
+              frame(content, user, await fetch_webhook(ctx.channel))
         else:
-            send_webhook(content, ctx.author, await fetch_webhook(ctx.channel))
+            frame(content, ctx.author, await fetch_webhook(ctx.channel))
     
     @commands.command()
     async def names(self, ctx):
