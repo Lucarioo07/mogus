@@ -151,6 +151,41 @@ class Owner(commands.Cog):
             )
 
             await pager.start(ctx)
+    
+    @commands.command()
+    @commands.is_owner()
+    async def addhelp(self, ctx, cmdname, cmddesc):
+      db['help'][cmdname] = cmddesc
+
+      embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
+      embed.set_footer(text="lol imagine asking for help")
+
+      await ctx.reply("Command successfully added, it'll look like this", embed=embed)
+    
+    @commands.command()
+    @commands.is_owner()
+    async def edithelp(self, ctx, cmdname, cmddesc):
+
+      if cmdname in db['help'].keys():
+        db['help'][cmdname] = cmddesc
+
+        embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
+        embed.set_footer(text="lol imagine asking for help")
+
+        await ctx.reply("Command successfully added, it'll look like this", embed=embed)
+      else:
+        await ctx.send("command not found")
+    
+    @commands.command()
+    @commands.is_owner()
+    async def deletehelp(self, ctx, cmdname):
+
+      if cmdname in db['help'].keys():
+        await ctx.send(f"Help entry for command `{cmdname}` has been deleted.")
+        del db['help'][cmdname]
+      else:
+        await ctx.send("command not found")
+    
 
 
 def setup(client):

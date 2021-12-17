@@ -3,12 +3,15 @@ import requests
 from discord.ext import commands
 from discord.ext.buttons import Paginator
 from discord_components import DiscordComponents
+from replit import db
 import os
 
 bot_token = os.environ['bot_token']
 
 client = commands.Bot(command_prefix=">")  
 com = DiscordComponents(client)
+
+staff = [764063896478154754, 764063938370469888, 764064311722508288, 764064474323746826]
 
 safe = [622090741862236200, 888373479655751700]
 
@@ -105,3 +108,23 @@ def get_key(val, my_dict):
              return key
  
     return "key doesn't exist"
+
+
+# Command Checks
+
+def in_guild(guild_id):
+      async def predicate(ctx):
+          return ctx.guild and ctx.guild.id == guild_id
+      return commands.check(predicate)
+    
+def is_not_banned():
+  async def predicate(ctx):
+    return ctx.author.id not in db['banned']
+  return commands.check(predicate)
+
+def is_staff():
+  async def predicate(ctx):
+    for role in ctx.author.roles:
+      if role.id in staff:
+        return True
+  return commands.check(predicate)

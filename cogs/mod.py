@@ -4,13 +4,15 @@ from replit import db
 from utils import *
 
 
+
 class Mod(commands.Cog):
 
     def __init__(self, client):
         self.client = client
     
     @commands.command()
-    @commands.is_owner()
+    @in_guild(764060384897925120)
+    @is_staff()
     async def warn(self, ctx, warned: discord.User, *, reason):
         try:
             db["warns"][str(ctx.guild.id)][str(warned.id)][str(ctx.message.id)] = {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id}
@@ -28,7 +30,8 @@ class Mod(commands.Cog):
         await ctx.send(embed=embed)
     
     @commands.command()
-    @commands.is_owner()
+    @in_guild(764060384897925120)
+    @is_staff()
     async def delwarn(self, ctx, user: discord.User, warn_id):
       try:
         if warn_id in db["warns"][str(ctx.guild.id)][str(user.id)].keys():
@@ -50,7 +53,8 @@ class Mod(commands.Cog):
       await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.is_owner()
+    @in_guild(764060384897925120)
+    @is_staff()
     async def clearwarn(self, ctx, user: discord.User):
       try:
         del db["warns"][str(ctx.guild.id)][str(user.id)]
