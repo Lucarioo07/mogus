@@ -4,6 +4,7 @@ from replit import db
 from random import choice
 import os
 from utils import *
+import time
 
 
 class Utility(commands.Cog):
@@ -33,6 +34,13 @@ class Utility(commands.Cog):
           
       embed.set_footer(text="lol imagine asking for help")
       await ctx.reply(embed=embed)
+    
+    @commands.command()
+    @commands.is_owner()
+    async def test(self, ctx):
+      await ctx.send("timer start")
+      time.sleep(15)
+      await ctx.reply("timer end")
  
 def setup(client):
     client.add_cog(Utility(client))

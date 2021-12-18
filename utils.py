@@ -3,6 +3,8 @@ import requests
 from discord.ext import commands
 from discord.ext.buttons import Paginator
 from discord_components import DiscordComponents
+import datetime
+import pytz
 from replit import db
 import os
 
@@ -109,7 +111,6 @@ def get_key(val, my_dict):
  
     return "key doesn't exist"
 
-
 # Command Checks
 
 def in_guild(guild_id):
@@ -124,7 +125,33 @@ def is_not_banned():
 
 def is_staff():
   async def predicate(ctx):
-    for role in ctx.author.roles:
+    return staff_check(ctx.author)
+  return commands.check(predicate)
+
+# Mod Stuff ig
+
+def staff_check(user: discord.User):
+  for role in user.roles:
       if role.id in staff:
         return True
-  return commands.check(predicate)
+
+def recent_warns(user, guild):
+  count = 0
+  now = datetime.datetime.now(dxb_tz)
+  for warn in db['warns'][str(guild)][str(user)].values():
+    timestr = warn['time']
+    wtime = datetime.datetime.strptime(timestr, "%d %B %Y")
+    delta = now - wtime
+    if delta.days < 4:
+      count += 1
+  return count
+    
+pun = {
+  "30m": datetime.timedelta(minutes=30),
+  "1h": datetime.timedelta(hours= 1),
+  "1d": datetime.timedelta(days= 1),
+  "3d": datetime.timedelta(days= 3)
+}
+
+dxb_tz = pytz.timezone("Asia/Dubai")
+

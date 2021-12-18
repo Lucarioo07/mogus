@@ -1,6 +1,7 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from replit import db
+import datetime
 from utils import *
 
 
@@ -9,24 +10,76 @@ class Mod(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-    
+        self.punishmentcheck.start()
+
+    def cog_unload(self):
+        self.punishmentcheck.cancel()
+
+    # Tasks
+
+    @tasks.loop(seconds=15.0)
+    async def punishmentcheck(self):
+      now = datetime.datetime.now(dxb_tz)
+      guild = client.get_guild(764060384897925120)
+      print(guild.name)
+      muterole = discord.utils.get(guild.roles, id=764060384956383237)
+
+      for timestr in db['punishments']['mute'].values():
+        wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+        delta = wtime - now
+        if delta.total_seconds() < 0:
+          userid = get_key(timestr, db['punishments']['mute'])
+          member = await guild.fetch_member(userid)
+          await member.remove_roles(muterole)
+          del db['punishments']['mute'][userid]
+
+
+    # Commands
     @commands.command()
     @in_guild(764060384897925120)
     @is_staff()
-    async def warn(self, ctx, warned: discord.User, *, reason):
+    async def warn(self, ctx, warned: discord.Member, *, reason):
+
+        now = datetime.datetime.now(dxb_tz)
+        timestr = now.strftime("%d %B %Y")
         try:
-            db["warns"][str(ctx.guild.id)][str(warned.id)][str(ctx.message.id)] = {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id}
+            db["warns"][str(ctx.guild.id)][str(warned.id)][str(ctx.message.id)] = {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id, "time": timestr}
 
         except:
           try:
-            db["warns"][str(ctx.guild.id)][str(warned.id)] = {str(ctx.message.id): {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id}}
+            db["warns"][str(ctx.guild.id)][str(warned.id)] = {str(ctx.message.id): {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id, "time": timestr}}
           except:
-            db["warns"][str(ctx.guild.id)] = {str(warned.id): {str(ctx.message.id): {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id}}}
+            db["warns"][str(ctx.guild.id)] = {str(warned.id): {str(ctx.message.id): {"staff": ctx.author.id, "reason": reason, "channel": ctx.channel.id, "time": timestr}}}
 
         embed = discord.Embed(
             description=f"***{str(warned)}** was warned by **{str(ctx.author)}** for* **`{reason}`**",
             color=cyan
         )
+
+        warncount = recent_warns(warned.id, ctx.guild.id)
+        muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
+
+        if warncount == 3:
+          dtime = now + pun['30m']
+          db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
+          await warned.add_roles(muterole)
+          embed.set_footer(text="User has also been muted for 30m for having 3 warns in the past 3 days")
+        elif warncount == 5:
+          dtime = now + pun['1h']
+          db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
+          await warned.add_roles(muterole)
+          embed.set_footer(text="User has also been muted for 1h for having 5 warns in the past 3 days")
+        elif warncount == 7:
+          dtime = now + pun['1d']
+          db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
+          await warned.add_roles(muterole)
+          embed.set_footer(text="User has also been muted for 1d having 7 warns in the past 3 days")
+        elif warncount == 10:
+          dtime = now + pun['3d']
+          db['punishments']['tempban'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
+          await ctx.guild.ban(warned)
+          embed.set_footer(text="User has also been tempbanned for 3d for having 10 warns in the past 3 days")
+
         await ctx.send(embed=embed)
     
     @commands.command()
