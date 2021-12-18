@@ -233,7 +233,7 @@ class Owner(commands.Cog):
     async def deletecmdhelp(self, ctx, cogname, cmdname):
 
       if cogname in db['help'].keys():
-        if cmdname in db['help']['cmds'][cogname].keys():
+        if cmdname in db['help'][cogname]['cmds'].keys():
           await ctx.send(f"Help entry for command `{cmdname}` has been deleted.")
           del db['help'][cmdname]
         else:

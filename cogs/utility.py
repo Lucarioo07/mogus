@@ -12,6 +12,33 @@ class Utility(commands.Cog):
     def __init__(self, client):
         self.client = client
     
+    # Events 
+
+    @commands.Cog.listener()
+    async def on_message(self, ctx):
+      afk = db['afk']
+      i = True
+      try:
+        for user in afk['server'][str(ctx.guild.id)].keys():
+          if f"<@!{user}>" in ctx.content:
+            embed = discord.Embed(
+              description=f"***{await client.fetch_user(user)}:** `{afk['server'][str(ctx.guild.id)][user]}`*", color=cyan
+            )
+            await ctx.reply(embed=embed)
+            i = False
+      except:
+        pass
+      if i:
+        for user in afk['global'].keys():
+          if f"<@!{user}>" in ctx.content:
+            embed = discord.Embed(
+              description=f"***{await client.fetch_user(user)}:** `{afk['global'][user]}`*", color=cyan
+            )
+            await ctx.reply(embed=embed)
+      
+
+    # Commands
+
     @commands.command(aliases=["halp"])
     async def help(self, ctx, field=None):
 
@@ -45,6 +72,40 @@ class Utility(commands.Cog):
         await ctx.reply(embed=embed)
       except:
         await ctx.reply(embed=discord.Embed(description= "Sorry but this field or command couldn't be found", color=cyan))
+    
+    @commands.command(aliases=['pingmsg'])
+    async def afk(self, ctx, *, message):
+
+      desc = ""
+
+      if message.startswith("global"):
+        m = message.replace("global ", "")
+        if m == "remove":
+          try:
+            del db['afk']['global'][str(ctx.author.id)]
+            desc = "Your global ping message has been removed"
+          except:
+            desc = "You don't have a global ping message to remove ffs"
+        else:
+          db['afk']['global'][str(ctx.author.id)] = m
+          desc = f"Your global ping message has been set to `{m}`"
+      else:
+        m = message
+        if m == "remove":
+          try:
+            del db['afk']['server'][str(ctx.guild.id)][str(ctx.author.id)]
+            desc = "Your server ping message has been removed"
+          except:
+            desc = "You don't have a server ping message to remove ffs"
+        else:
+          try:
+            db['afk']['server'][str(ctx.guild.id)][str(ctx.author.id)] = m
+          except:
+            db['afk']['server'][str(ctx.guild.id)] = {ctx.author.id: m}
+          desc = f"Your server ping message has been set to `{m}`"
+      
+      embed = discord.Embed(description=desc, color=cyan)
+      await ctx.send(embed=embed)
 
 
 def setup(client):
