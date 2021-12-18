@@ -21,7 +21,6 @@ class Mod(commands.Cog):
     async def punishmentcheck(self):
       now = datetime.datetime.now(dxb_tz)
       guild = client.get_guild(764060384897925120)
-      print(guild.name)
       muterole = discord.utils.get(guild.roles, id=764060384956383237)
 
       for timestr in db['punishments']['mute'].values():
@@ -59,27 +58,49 @@ class Mod(commands.Cog):
         warncount = recent_warns(warned.id, ctx.guild.id)
         muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
 
+        footer = ""
+
         if warncount == 3:
           dtime = now + pun['30m']
           db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
           await warned.add_roles(muterole)
-          embed.set_footer(text="User has also been muted for 30m for having 3 warns in the past 3 days")
+          footer = "User has also been muted for 30m for having 3 warns in the past 3 days. "
         elif warncount == 5:
           dtime = now + pun['1h']
           db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
           await warned.add_roles(muterole)
-          embed.set_footer(text="User has also been muted for 1h for having 5 warns in the past 3 days")
+          footer = "User has also been muted for 1h for having 5 warns in the past 3 days. "
         elif warncount == 7:
           dtime = now + pun['1d']
           db['punishments']['mute'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
           await warned.add_roles(muterole)
-          embed.set_footer(text="User has also been muted for 1d having 7 warns in the past 3 days")
+          footer = "User has also been muted for 1d having 7 warns in the past 3 days. "
         elif warncount == 10:
           dtime = now + pun['3d']
           db['punishments']['tempban'][str(warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
           await ctx.guild.ban(warned)
-          embed.set_footer(text="User has also been tempbanned for 3d for having 10 warns in the past 3 days")
+          footer = "User has also been tempbanned for 3d for having 10 warns in the past 3 days. "
 
+        if staff_check(warned):
+
+          if warncount < 2:
+
+            staff_rank : discord.Role
+
+            for roleid in staff:
+              for role in warned.roles:
+                if roleid == role.id:
+                  staff_rank = role
+
+            try:
+              demote_role = discord.utils.get(ctx.guild.roles, id=staff[(staff.index(staff_rank.id) + 1)])
+              warned.add_roles(demote_role)
+              footer = footer + f"Demoted to role of {demote_role.name}"
+            except:
+              footer = footer + f"Demoted to Member"
+            warned.remove_roles(staff_rank)
+        
+        embed.set_footer(footer)
         await ctx.send(embed=embed)
     
     @commands.command()
@@ -153,6 +174,8 @@ class Mod(commands.Cog):
                 description += f'> [**{reason[0:20]}...**]({msg.jump_url} "Warn ID: {warn_id}") \n'
           embed.description = description
           await ctx.send(embed=embed)
+      
+    
         
 
 def setup(client):

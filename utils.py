@@ -137,7 +137,7 @@ def staff_check(user: discord.User):
 
 def recent_warns(user, guild):
   count = 0
-  now = datetime.datetime.now(dxb_tz)
+  now = datetime.datetime.now()
   for warn in db['warns'][str(guild)][str(user)].values():
     timestr = warn['time']
     wtime = datetime.datetime.strptime(timestr, "%d %B %Y")
