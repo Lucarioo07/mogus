@@ -110,44 +110,53 @@ class Mod(commands.Cog):
     @commands.command()
     @in_guild(764060384897925120)
     @is_staff()
-    async def delwarn(self, ctx, user: discord.User, warn_id):
+    async def delwarn(self, ctx, warn_id):
       try:
-        if warn_id in db["warns"][str(ctx.guild.id)][str(user.id)].keys():
+        found = False
+        for user in db['warns'][str(ctx.guild.id)].keys():
+          if warn_id in db['warns'][str(ctx.guild.id)][user].keys():
+            del db['warns'][str(ctx.guild.id)][user][warn_id]
+            embed = discord.Embed(
+            description=f"*The warn with ID `{warn_id}` has been deleted from **{await client.fetch_user(user)}***",
+            color=cyan
+            )
+            found = True
+            break
+        if not found:
           embed = discord.Embed(
-            description=f"The warn with ID `{warn_id}` has been deleted.",
+            description=f"A warn with ID `{warn_id}` couldnt't be found",
             color=cyan
           )
-          del db["warns"][str(ctx.guild.id)][str(user.id)][warn_id]
-        else:
-          embed = discord.Embed(
-            description=f"A warn for this user with ID `{warn_id}` couldnt't be found.",
-            color=cyan
-          )
+
       except:
         embed = discord.Embed(
-            description=f"A warn for this user with ID `{warn_id}` couldnt't be found.",
+            description=f"A warn for this user with ID `{warn_id}` couldnt't be found",
             color=cyan
           )
       await ctx.send(embed=embed)
+  
     
     @commands.command()
     @in_guild(764060384897925120)
     @is_staff()
-    async def editwarn(self, ctx, user: discord.User, warn_id, new):
+    async def editwarn(self, ctx, warn_id, new):
       try:
-        if warn_id in db["warns"][str(ctx.guild.id)][str(user.id)].keys():
-
-          db["warns"][str(ctx.guild.id)][str(user.id)][warn_id]['reason'] = new
-
+        found = False
+        for user in db['warns'][str(ctx.guild.id)].keys():
+          if warn_id in db['warns'][str(ctx.guild.id)][user].keys():
+            db['warns'][str(ctx.guild.id)][user][warn_id] = new
+            embed = discord.Embed(
+            description=f"Warn `{warn_id}` reason has been successfully edited to `{new}`",
+            color=cyan
+            )
+            found = True
+            break
+        if not found:
           embed = discord.Embed(
-            description=f"Warn `{warn_id}` reason has been successfully edited to `{reason}`.",
+            description=f"A warn with ID `{warn_id}` couldnt't be found",
             color=cyan
           )
-        else:
-          embed = discord.Embed(
-            description=f"A warn for this user with ID `{warn_id}` couldnt't be found",
-            color=cyan
-          )
+
       except:
         embed = discord.Embed(
             description=f"A warn for this user with ID `{warn_id}` couldnt't be found",
@@ -163,7 +172,7 @@ class Mod(commands.Cog):
         del db["warns"][str(ctx.guild.id)][str(user.id)]
         await ctx.send(embed=discord.Embed(description=f"***{user}** has had their warns cleared*", color=cyan))
       except:
-        await ctx.send(embed=discord.Embed(description=f"*It appears **`{user}`** doesn't have any warns, we could fix that...*", color=cyan))
+        await ctx.send(embed=discord.Embed(description=f"*It appears **`{user}`** doesn't have any warns, but we could fix that...*", color=cyan))
 
     @commands.command(aliases=["warnings", "oopsies"])
     @in_guild(764060384897925120)

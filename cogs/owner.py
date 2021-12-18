@@ -152,39 +152,95 @@ class Owner(commands.Cog):
 
             await pager.start(ctx)
     
-    @commands.command()
-    @commands.is_owner()
-    async def addhelp(self, ctx, cmdname, cmddesc):
-      db['help'][cmdname] = cmddesc
 
-      embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
+    # _HELP EDIT COMMANDS_
+
+    # Cog Help Commands
+
+    @commands.command(aliases=['ach'])
+    @commands.is_owner()
+    async def addcoghelp(self, ctx, cogname, cogdesc):
+
+      db['help'][cogname]= {"desc": cogdesc, "cmds": {}}
+
+      embed = discord.Embed(title= f"{cogname} Field", description= f"> {cogdesc}", color=cyan)
       embed.set_footer(text="lol imagine asking for help")
 
-      await ctx.reply("Command successfully added, it'll look like this", embed=embed)
-    
-    @commands.command()
-    @commands.is_owner()
-    async def edithelp(self, ctx, cmdname, cmddesc):
+      await ctx.reply("Cog successfully added, it'll look like this", embed=embed)
 
-      if cmdname in db['help'].keys():
-        db['help'][cmdname] = cmddesc
+    
+    @commands.command(aliases=['ech'])
+    @commands.is_owner()
+    async def editcoghelp(self, ctx, cogname, cogdesc):
+      if cogname in db['help'].keys():
+
+        db['help'][cogname]['desc'] = cogdesc
+
+        embed = discord.Embed(title= f"{cogname} Field", description= f"> {cogdesc}", color=cyan)
+        embed.set_footer(text="lol imagine asking for help")
+
+        await ctx.reply("Cog successfully edited, it'll look like this", embed=embed)
+
+      else:
+        await ctx.send("cog not found")
+    
+    @commands.command(aliases=['dcgh'])
+    @commands.is_owner()
+    async def deletecoghelp(self, ctx, cogname):
+
+      if cogname in db['help'].keys():
+        await ctx.send(f"Help entry for Cog `{cogname}` has been deleted.")
+        del db['help'][cogname]
+      else:
+        await ctx.send("cog not found")
+
+
+    # Command Help Commands
+
+    @commands.command(aliases=['acdh'])
+    @commands.is_owner()
+    async def addcmdhelp(self, ctx, cogname, cmdname, cmddesc):
+
+      if cogname in db['help'].keys():
+        db['help'][cogname]['cmds'][cmdname] = cmddesc
 
         embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
         embed.set_footer(text="lol imagine asking for help")
 
         await ctx.reply("Command successfully added, it'll look like this", embed=embed)
       else:
-        await ctx.send("command not found")
+        await ctx.send("cog not found")
     
-    @commands.command()
+    @commands.command(aliases=['ecdh'])
     @commands.is_owner()
-    async def deletehelp(self, ctx, cmdname):
+    async def editcmdhelp(self, ctx, cogname, cmdname, cmddesc):
 
-      if cmdname in db['help'].keys():
-        await ctx.send(f"Help entry for command `{cmdname}` has been deleted.")
-        del db['help'][cmdname]
+      if cogname in db['help'].keys():
+        if cmdname in db['help'][cogname]['cmds'].keys():
+          db['help'][cogname]['cmds'][cmdname] = cmddesc
+
+          embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
+          embed.set_footer(text="lol imagine asking for help")
+
+          await ctx.reply("Command successfully edited, it'll look like this", embed=embed)
+        else:
+          await ctx.send("command not found")
       else:
-        await ctx.send("command not found")
+        await ctx.send("cog not found")
+    
+    @commands.command(aliases=['dcdh'])
+    @commands.is_owner()
+    async def deletecmdhelp(self, ctx, cogname, cmdname):
+
+      if cogname in db['help'].keys():
+        if cmdname in db['help']['cmds'][cogname].keys():
+          await ctx.send(f"Help entry for command `{cmdname}` has been deleted.")
+          del db['help'][cmdname]
+        else:
+          await ctx.send("command not found")
+      else:
+        await ctx.send("cog not found")
+    
     
 
 
