@@ -24,7 +24,8 @@ class Mod(commands.Cog):
       muterole = discord.utils.get(guild.roles, id=764060384956383237)
 
       for timestr in db['punishments']['mute'].values():
-        wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+        raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+        wtime = raw_wtime.replace(tzinfo=dxb_tz)
         delta = wtime - now
         if delta.total_seconds() < 0:
           userid = get_key(timestr, db['punishments']['mute'])
@@ -37,8 +38,11 @@ class Mod(commands.Cog):
     @commands.command()
     @in_guild(764060384897925120)
     @is_staff()
-    async def warn(self, ctx, warned: discord.Member, *, reason):
+    async def warn(self, ctx, warned: discord.Member, *, reason=None):
 
+        if not reason:
+          await ctx.reply("Please specify a reason, can't warn without one sadly")
+          return
         now = datetime.datetime.now(dxb_tz)
         timestr = now.strftime("%d %B %Y")
         try:
@@ -83,7 +87,7 @@ class Mod(commands.Cog):
 
         if staff_check(warned):
 
-          if warncount < 2:
+          if warncount > 2:
 
             staff_rank : discord.Role
 
@@ -94,13 +98,13 @@ class Mod(commands.Cog):
 
             try:
               demote_role = discord.utils.get(ctx.guild.roles, id=staff[(staff.index(staff_rank.id) + 1)])
-              warned.add_roles(demote_role)
+              await warned.add_roles(demote_role)
               footer = footer + f"Demoted to role of {demote_role.name}"
             except:
               footer = footer + f"Demoted to Member"
-            warned.remove_roles(staff_rank)
+            await warned.remove_roles(staff_rank)
         
-        embed.set_footer(footer)
+        embed.set_footer(text=footer)
         await ctx.send(embed=embed)
     
     @commands.command()
@@ -125,6 +129,31 @@ class Mod(commands.Cog):
             color=cyan
           )
       await ctx.send(embed=embed)
+    
+    @commands.command()
+    @in_guild(764060384897925120)
+    @is_staff()
+    async def editwarn(self, ctx, user: discord.User, warn_id, new):
+      try:
+        if warn_id in db["warns"][str(ctx.guild.id)][str(user.id)].keys():
+
+          db["warns"][str(ctx.guild.id)][str(user.id)][warn_id]['reason'] = new
+
+          embed = discord.Embed(
+            description=f"Warn `{warn_id}` reason has been successfully edited to `{reason}`.",
+            color=cyan
+          )
+        else:
+          embed = discord.Embed(
+            description=f"A warn for this user with ID `{warn_id}` couldnt't be found",
+            color=cyan
+          )
+      except:
+        embed = discord.Embed(
+            description=f"A warn for this user with ID `{warn_id}` couldnt't be found",
+            color=cyan
+          )
+      await ctx.send(embed=embed)
 
     @commands.command()
     @in_guild(764060384897925120)
@@ -132,11 +161,12 @@ class Mod(commands.Cog):
     async def clearwarn(self, ctx, user: discord.User):
       try:
         del db["warns"][str(ctx.guild.id)][str(user.id)]
-        await ctx.send(embed=discord.Embed(description=f"**`{user}`** has had their warns cleared.", color=cyan))
+        await ctx.send(embed=discord.Embed(description=f"***{user}** has had their warns cleared*", color=cyan))
       except:
-        await ctx.send(embed=discord.Embed(description=f"It appears **`{user}`** doesn't have any warns, we could fix that...", color=cyan))
+        await ctx.send(embed=discord.Embed(description=f"*It appears **`{user}`** doesn't have any warns, we could fix that...*", color=cyan))
 
     @commands.command(aliases=["warnings", "oopsies"])
+    @in_guild(764060384897925120)
     async def warns(self, ctx, user: discord.User= None):
 
         if user is None:
@@ -159,12 +189,14 @@ class Mod(commands.Cog):
               warn_id = get_key(value, warns)
               reason = value["reason"]
               channel = await client.fetch_channel(value['channel'])
+              timestamp = value["time"]
               msg = await channel.fetch_message(warn_id)
               
               embed.add_field(
                 name=f"ID: `{warn_id}` \n",
                 
                 value=f"Staff: `{await client.fetch_user(value['staff'])}` \n"
+                      f"Timestamp: `{timestamp}` \n"
                       f"Reason: \n"
                       f"> **`{reason}`**"
               )
@@ -174,9 +206,69 @@ class Mod(commands.Cog):
                 description += f'> [**{reason[0:20]}...**]({msg.jump_url} "Warn ID: {warn_id}") \n'
           embed.description = description
           await ctx.send(embed=embed)
-      
+
+    @commands.command(aliases=['shut'])  
+    @in_guild(764060384897925120)
+    @is_staff()
+    async def mute(self, ctx, member: discord.Member, timestr='30m'):
+
+      try:
+        duration = timestr[:-1] 
+        timetype = timestr[-1]
+
+        if timetype == "m":
+          delta = datetime.timedelta(minutes=int(duration))
+        elif timetype == "h":
+          delta = datetime.timedelta(hours=int(duration))
+        elif timetype == "d":
+          delta = datetime.timedelta(days=int(duration))
+        else:
+          await ctx.send("Invalid time input")
+          return
+      except Exception as e:
+        print(e)
+        await ctx.send("Invalid time input")
+        return
+
+      muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
+
+      if muterole not in member.roles:
+        await member.add_roles(muterole)
+        mtime = datetime.datetime.now(dxb_tz) + delta
+        db['punishments']['mute'][str(member.id)] = mtime.strftime("%d %B %Y, %H:%M")
+  
+        embed = discord.Embed(
+            description=f"***{str(member)}** was muted by **{str(ctx.author)}** for* **`{delta}`**",
+            color=cyan
+        )
+      else:
+        embed = discord.Embed(
+            description=f"***{str(member)}** is already muted lmao",
+            color=cyan
+        )
+      await ctx.send(embed=embed)
+
+    @commands.command(aliases=['unshut'])  
+    @in_guild(764060384897925120)
+    @is_staff()
+    async def unmute(self, ctx, member: discord.Member):
+      muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
+
+
+      if muterole in member.roles:
+        await member.remove_roles(muterole)
+        del db['punishments']['mute'][str(member.id)]
+        embed = discord.Embed(
+            description=f"***{str(member)}** was unmuted by **{str(ctx.author)}***",
+            color=cyan
+        )
+      else:
+        embed = discord.Embed(
+            description=f"***{str(member)}** is not muted*",
+            color=cyan
+        )
+      await ctx.send(embed=embed)
     
-        
 
 def setup(client):
     client.add_cog(Mod(client))
