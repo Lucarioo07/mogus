@@ -11,3 +11,6 @@
 ###### Original Dragonball-Z Game
   - ummm.. not exactly factually correct but yeah
   - Tutorial and info provided in the `info` command
+###### Creative Moderation Solutions
+  - Currently for a private server
+  - I'm planning on making it public after a while
