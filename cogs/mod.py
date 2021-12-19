@@ -38,11 +38,8 @@ class Mod(commands.Cog):
     @commands.command()
     @in_guild(764060384897925120)
     @is_staff()
-    async def warn(self, ctx, warned: discord.Member, *, reason=None):
+    async def warn(self, ctx, warned: discord.Member, *, reason):
 
-        if not reason:
-          await ctx.reply("Please specify a reason, can't warn without one sadly")
-          return
         now = datetime.datetime.now(dxb_tz)
         timestr = now.strftime("%d %B %Y")
         try:
