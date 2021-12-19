@@ -106,6 +106,7 @@ class Mod(commands.Cog):
         
         embed.set_footer(text=footer)
         await ctx.send(embed=embed)
+        await warned.send(embed=embed)
     
     @commands.command()
     @in_guild(764060384897925120)
@@ -251,6 +252,7 @@ class Mod(commands.Cog):
             description=f"***{str(member)}** was muted by **{str(ctx.author)}** for* **`{delta}`**",
             color=cyan
         )
+        await member.send(embed=embed)
       else:
         embed = discord.Embed(
             description=f"***{str(member)}** is already muted lmao",

@@ -40,7 +40,7 @@ class Utility(commands.Cog):
     # Commands
 
     @commands.command(aliases=["halp"])
-    @commands.command(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, field=None):
 
       cmds = db['help']
