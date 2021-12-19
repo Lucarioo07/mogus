@@ -31,6 +31,7 @@ class Fun(commands.Cog):
     # Commands
 
     @commands.command()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def frame(self, ctx, user: discord.Member, *, content):
 
         banned = db["banned"]

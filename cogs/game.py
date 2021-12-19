@@ -11,6 +11,7 @@ class Game(commands.Cog):
 
 
   @commands.command(aliases=["dbzinfo", "info"])
+  @commands.cooldown(1, 10, commands.BucketType.user)
   async def dbz_info(self, ctx):
 
     embed = discord.Embed(
@@ -42,6 +43,7 @@ class Game(commands.Cog):
 
 
   @commands.command(aliases=["fight", "dbz"])
+  @commands.cooldown(1, 5, commands.BucketType.user)
   async def challenge(self, ctx, opponent: discord.Member, reloads=0, saiyan = 0):
 
       global message, embed

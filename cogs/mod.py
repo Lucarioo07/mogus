@@ -176,6 +176,7 @@ class Mod(commands.Cog):
 
     @commands.command(aliases=["warnings", "oopsies"])
     @in_guild(764060384897925120)
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def warns(self, ctx, user: discord.User= None):
 
         if user is None:

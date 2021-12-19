@@ -40,6 +40,7 @@ class Utility(commands.Cog):
     # Commands
 
     @commands.command(aliases=["halp"])
+    @commands.command(1, 5, commands.BucketType.user)
     async def help(self, ctx, field=None):
 
       cmds = db['help']
@@ -74,6 +75,7 @@ class Utility(commands.Cog):
         await ctx.reply(embed=discord.Embed(description= "Sorry but this field or command couldn't be found", color=cyan))
     
     @commands.command(aliases=['pingmsg'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def afk(self, ctx, *, message):
 
       desc = ""
