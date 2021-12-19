@@ -14,3 +14,5 @@
 ###### Creative Moderation Solutions
   - Currently for a private server
   - I'm planning on making it public after a while
+###### Utility
+  - A command to send a message when you get pinged, kinda like AFK but doesn't time out.
