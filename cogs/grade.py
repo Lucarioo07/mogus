@@ -6,7 +6,7 @@ from utils import *
 
 
 
-class Mod(commands.Cog):
+class Grade(commands.Cog):
 
     def __init__(self, client):
         self.client = client
@@ -280,4 +280,4 @@ class Mod(commands.Cog):
     
 
 def setup(client):
-    client.add_cog(Mod(client))
+    client.add_cog(Grade(client))

@@ -110,5 +110,71 @@ class Utility(commands.Cog):
       await ctx.send(embed=embed)
 
 
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def todo(self, ctx, todo=None):
+  
+      if not todo:
+        if ctx.author.id in db['todo'].tags():
+          for to in db['todo'][str(ctx.author.id)]:
+            todo = "```prolog\n"
+            i = 0
+            empty = True
+            for to in db['todo'][str(ctx.author.id)]:
+                todo += f"{i}. {db['todo'][str(ctx.author.id)][i]}\n"
+                i += 1
+                empty = False
+
+            todo += "```"
+            if empty:
+                todo = "There aren't any entries in your to-do list f"
+
+      else:
+        if todo.startswith("add "):
+            t = todo[4:]
+
+            if t.len() > 50:
+              todo = "Too large, keep it under 50 characters"
+            else:
+              try:
+                  tod = db['todo'][str(ctx.author.id)]
+                  tod.append(t)
+                  db['todo'][str(ctx.author.id)] = tod
+              except:
+                  db['todo'][ctx.author.id] = [t]
+              todo = f"Added entry `{t}` to your list"
+
+        elif todo.startswith("remove "):
+            t = todo[7:]
+
+            if t.len() > 50:
+              todo = "Too large, keep it under 50 characters"
+            else:
+              try:
+                  tod = db['todo'][str(ctx.author.id)]
+
+                  if t.isnumeric():
+                    if int(t) <= tod.len():
+                      del tod[int(t) + 1]
+                      todo = f"Deleted entry number {t} from the list"
+                    else:
+                      todo = f"an entry with this number doesn't exist"
+
+                  else:
+                    try:
+                      tod.remove(t)
+                      todo = f"Deleted entry {t} from the list"
+                    except:
+                      todo = f"This entry doesn't exist, make sure capitalization is correct or just use the index."
+
+                  db['todo'][str(ctx.author.id)] = tod
+              except:
+                todo = "You don't have any entries in your todo list 💀"
+              
+      embed = discord.Embed(description=todo, color=cyan)
+
+
+
+
 def setup(client):
   client.add_cog(Utility(client))
