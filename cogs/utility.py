@@ -172,9 +172,17 @@ class Utility(commands.Cog):
                 todo = "You don't have any entries in your todo list 💀"
               
       embed = discord.Embed(description=todo, color=cyan)
+    
+    @commands.command()
+    @commands.has_permissions(manage_guild=True)
+    async def set_prefix(self, ctx, *, prefix):
+      db['prefix'][str(ctx.guild.id)] = prefix
+      embed = discord.Embed(description=f"The prefix of this server has been changed to `{prefix}`")
 
+      if prefix.len() > 2:
+        embed.set_footer(text="We recommend the prefix is two characters or less")
 
-
+      await ctx.send(embed=embed)
 
 def setup(client):
   client.add_cog(Utility(client))

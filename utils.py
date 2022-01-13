@@ -10,7 +10,13 @@ import os
 
 bot_token = os.environ['bot_token']
 
-client = commands.Bot(command_prefix=">")  
+
+async def prefix(client, message):
+  return db['prefix'][str(message.guild.id)]
+  
+client = commands.Bot(command_prefix= prefix)  
+
+
 com = DiscordComponents(client)
 
 staff = [764063896478154754, 764063938370469888, 764064311722508288, 764064474323746826]

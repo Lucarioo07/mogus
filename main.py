@@ -4,6 +4,7 @@ from discord_components import Button, ButtonStyle
 from utils import *
 from keep_alive import keep_alive
 import os
+from replit import db
 
 client.remove_command("help")
 
@@ -18,6 +19,12 @@ async def on_ready():
             client.load_extension(f"cogs.{filename[:-3]}")
 
     print("Bot is ready.")
+
+
+@client.event
+async def on_guild_join(guild):
+  if str(guild.id) not in db['prefix'].tags():
+    db['prefix'][str(guild.id)] = ">"
 
 
 @client.command()
