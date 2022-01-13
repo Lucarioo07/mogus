@@ -31,28 +31,14 @@ class Fun(commands.Cog):
     # Commands
 
     @commands.command()
-    @commands.cooldown(1, 3, commands.BucketType.user)
+    @is_not_banned()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def frame(self, ctx, user: discord.Member, *, content):
 
-        banned = db["banned"]
-
-        if await commands.Bot.is_owner(client, ctx.author) or (
-                (user.id not in safe) and (ctx.author.id not in banned)):
-            if content != "":
-              
-              frame(content, user, await fetch_webhook(ctx.channel))
-        else:
-            frame(content, ctx.author, await fetch_webhook(ctx.channel))
-    
-    @commands.command()
-    async def names(self, ctx):
-      if ctx.guild.id == 764060384897925120:
-
-        chn = await client.fetch_channel(765197786680786964)
-        msg = await chn.fetch_message(896296462328135680)
-        desc = f'{msg.content}\n [Original](https://discord.com/channels/{ctx.guild.id}/{chn.id}/{msg.id} "Jump to original message")'
-        await ctx.send(embed=discord.Embed(description=desc, color=cyan))
-      
+      if is_owner(ctx.author.id) or (user.id not in safe):
+        frame(content, user, await fetch_webhook(ctx.channel))
+      else:
+        frame(content, ctx.author, await fetch_webhook(ctx.channel))
 
 
 def setup(client):

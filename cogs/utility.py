@@ -36,6 +36,16 @@ class Utility(commands.Cog):
             )
             await ctx.reply(embed=embed)
       
+      try:
+        if ctx.mentions[0] == client.user:
+          await ctx.channel.send(embed=discord.Embed(
+            description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
+            color=cyan
+            ))
+      except: 
+        pass
+
+      
 
     # Commands
 
@@ -116,7 +126,6 @@ class Utility(commands.Cog):
   
       if not todo:
         if ctx.author.id in db['todo'].tags():
-          for to in db['todo'][str(ctx.author.id)]:
             todo = "```prolog\n"
             i = 0
             empty = True
@@ -177,10 +186,8 @@ class Utility(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def set_prefix(self, ctx, *, prefix):
       db['prefix'][str(ctx.guild.id)] = prefix
-      embed = discord.Embed(description=f"The prefix of this server has been changed to `{prefix}`")
 
-      if prefix.len() > 2:
-        embed.set_footer(text="We recommend the prefix is two characters or less")
+      embed = discord.Embed(description=f"The prefix of this server has been changed to `{prefix}`", color=cyan)
 
       await ctx.send(embed=embed)
 

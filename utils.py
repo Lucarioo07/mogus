@@ -117,6 +117,9 @@ def get_key(val, my_dict):
  
     return "key doesn't exist"
 
+def is_owner(userid):
+  return userid == "622090741862236200"
+
 # Command Checks
 
 def in_guild(guild_id):
