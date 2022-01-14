@@ -19,7 +19,9 @@ client = commands.Bot(command_prefix= prefix)
 
 com = DiscordComponents(client)
 
-staff = [764063896478154754, 764063938370469888, 764064311722508288, 764064474323746826]
+gstaff = 
+
+mstaff = 
 
 safe = [622090741862236200, 888373479655751700]
 
@@ -134,14 +136,15 @@ def is_not_banned():
 
 def is_staff():
   async def predicate(ctx):
-    return staff_check(ctx.author)
+    return staff_check(ctx.author, ctx.guild)
   return commands.check(predicate)
+
 
 # Mod Stuff ig
 
-def staff_check(user: discord.User):
+def staff_check(user: discord.User, guild: discord.Guild):
   for role in user.roles:
-      if role.id in staff:
+      if role.id in db['staff'][str(guild.id)]:
         return True
 
 def recent_warns(user, guild):

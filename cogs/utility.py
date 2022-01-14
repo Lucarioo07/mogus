@@ -20,7 +20,7 @@ class Utility(commands.Cog):
       i = True
       try:
         for user in afk['server'][str(ctx.guild.id)].keys():
-          if f"<@!{user}>" in ctx.content:
+          if await client.fetch_user(user) in ctx.mentions:
             embed = discord.Embed(
               description=f"***{await client.fetch_user(user)}:** `{afk['server'][str(ctx.guild.id)][user]}`*", color=cyan
             )
@@ -30,20 +30,18 @@ class Utility(commands.Cog):
         pass
       if i:
         for user in afk['global'].keys():
-          if f"<@!{user}>" in ctx.content:
+          if await client.fetch_user(user) in ctx.mentions:
             embed = discord.Embed(
               description=f"***{await client.fetch_user(user)}:** `{afk['global'][user]}`*", color=cyan
             )
             await ctx.reply(embed=embed)
       
-      try:
+      if ctx.mentions > 0:
         if ctx.mentions[0] == client.user:
           await ctx.channel.send(embed=discord.Embed(
             description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
             color=cyan
             ))
-      except: 
-        pass
 
       
 

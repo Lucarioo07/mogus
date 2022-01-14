@@ -15,7 +15,7 @@ class Mystics(commands.Cog):
     # Commands 
 
     @in_guild(927259600628088842)
-    @commands.is_owner()
+    @is_staff
     @commands.command()
     async def log(self, ctx, win: discord.Member, lose: discord.Member):
     
@@ -36,7 +36,6 @@ class Mystics(commands.Cog):
       await ctx.send(embed=embed)
 
     @in_guild(927259600628088842)
-    @commands.is_owner()
     @commands.command(aliases= ['view', 'point'])
     async def viewpoint(self, ctx, user: discord.Member = None):
 
@@ -52,7 +51,7 @@ class Mystics(commands.Cog):
       await ctx.send(embed=embed)
     
     @in_guild(927259600628088842)
-    @commands.is_owner()
+    @is_staff
     @commands.command()
     async def editpoint(self, ctx, user: discord.Member, point):
 
@@ -90,7 +89,7 @@ class Mystics(commands.Cog):
       embed = discord.Embed(description=lb)
 
     @in_guild(927259600628088842)
-    @commands.is_owner()
+    @is_staff
     @commands.command()
     async def reset(self, ctx):
 
