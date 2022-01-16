@@ -16,34 +16,30 @@ class Utility(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
-            
-      if len(ctx.mentions) > 0:
-
+      if ctx.author != client.user:
         afk = db['afk']
-        i = True
-        if ctx.guild.id in afk['server'].keys():
-          for user in afk['server'][str(ctx.guild.id)].keys():
-            if f"<@!{user}>" in ctx.content:
-              embed = discord.Embed(
-                description=f"***{await client.fetch_user(user)}:** `{afk['server'][str(ctx.guild.id)][user]}`*", color=cyan
-              )
-              await ctx.send(embed=embed)
-              i = False
-        if i:
-          for user in afk['global'].keys():
-            if f"<@!{user}>" in ctx.content:
-              embed = discord.Embed(
-                description=f"***{await client.fetch_user(user)}:** `{afk['global'][user]}`*", color=cyan
-              )
-              await ctx.send(embed=embed)
+        for user in ctx.mentions:
+          if str(ctx.guild.id) in afk['server'].keys() and str(user.id) in afk['server'][str(ctx.guild.id)]:
+            embed = discord.Embed(
+              description=f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*", 
+              color=cyan
+            )
+            await ctx.reply(embed=embed)
 
-        if ctx.content == client.user.mention:
-          await ctx.channel.send(embed=discord.Embed(
-            description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
-            color=cyan
-            ))
+          elif str(user.id) in afk['global'].keys():
+            embed = discord.Embed(
+              description=f"***{user}:** `{afk['global'][str(user.id)]}`*", 
+              color=cyan
+            )
+            await ctx.reply(embed=embed)
 
-      
+          if user == client.user:
+            embed = discord.Embed(
+              description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
+              color=cyan
+              )
+            await ctx.reply(embed=embed)
+
 
     # Commands
 
@@ -82,7 +78,7 @@ class Utility(commands.Cog):
       except:
         await ctx.reply(embed=discord.Embed(description= "Sorry but this field or command couldn't be found", color=cyan))
     
-    @commands.command(aliases=['pingmsg'])
+    @commands.command(aliases=['pingmsg', 'pingmessage'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def afk(self, ctx, *, message):
 
@@ -181,6 +177,7 @@ class Utility(commands.Cog):
       embed = discord.Embed(description=todo, color=cyan)
     
     @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.has_permissions(manage_guild=True)
     async def set_prefix(self, ctx, *, prefix):
       db['prefix'][str(ctx.guild.id)] = prefix

@@ -43,9 +43,9 @@ class Mystics(commands.Cog):
         user = ctx.author
 
       if str(user.id) not in db['points'].keys():
-        e = f"`{user}` has no points f"
-      else:
-        e = f"`{user}` has `{db['points'][str(user.id)]}` points"
+        db['points'][str(user.id)] = 0
+    
+      e = f"`{user}` has `{db['points'][str(user.id)]}` points"
       
       embed = discord.Embed(description=e, color=cyan)
       await ctx.reply(embed=embed)
@@ -56,12 +56,12 @@ class Mystics(commands.Cog):
     async def editpoint(self, ctx, user: discord.Member, point:int):
 
       if str(user.id) not in db['points'].keys():
-        e = f"`{user}` has no points f"
-      else:
-        old = db['points'][str(user.id)]
-        db['points'][str(user.id)] = point
+        db['points'][str(user.id)] = 0
+    
+      old = db['points'][str(user.id)]
+      db['points'][str(user.id)] = point
 
-        e = f"`{user}`'s points have been changed from `{old}` to `{point}`"
+      e = f"`{user}`'s points have been changed from `{old}` to `{point}`"
       
       embed = discord.Embed(description=e, color=cyan)
       await ctx.reply(embed=embed)

@@ -5,7 +5,6 @@ import datetime
 from utils import *
 
 
-
 class Grade(commands.Cog):
 
     def __init__(self, client):

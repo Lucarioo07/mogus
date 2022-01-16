@@ -28,7 +28,7 @@ class Errors(commands.Cog):
       elif isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(
           title="Missing Argument", 
-          description=f"You missed the `{error.param}` argument, check the help command for information about any command", 
+          description=f"You missed the `{error.param}` argument, check `{db['prefix'][str(ctx.guild.id)]}help` for information about any command", 
           color=cyan
         )
         await ctx.send(embed=embed, delete_after=30)
@@ -36,7 +36,7 @@ class Errors(commands.Cog):
       elif isinstance(error, commands.TooManyArguments):
         embed = discord.Embed(
           title="Too Many Arguments", 
-          description=f"You entered too many arguments, check the help command for information about any command", 
+          description=f"You entered too many arguments, check `{db['prefix'][str(ctx.guild.id)]}help` for information about any command", 
           color=cyan
         )
         await ctx.send(embed=embed, delete_after=30)
@@ -44,7 +44,7 @@ class Errors(commands.Cog):
       elif isinstance(error, commands.BadArgument):
         embed = discord.Embed(
           title="Wrong Argument(s) Given", 
-          description="Something went wrong with the argument(s) you gave, check the help command for information about any command", 
+          description=f"Something went wrong with the argument(s) you gave, check `{db['prefix'][str(ctx.guild.id)]}help` for information about any command", 
           color=cyan
         )
         await ctx.send(embed=embed, delete_after=30)
@@ -100,6 +100,13 @@ class Errors(commands.Cog):
           )
           await ctx.send(embed=embed, delete_after=30)
       
+      elif isinstance(error, commands.CommandNotFound):
+        embed = discord.Embed(
+            description=f"This command does not exist, check `{db['prefix'][str(ctx.guild.id)]}help`", 
+            color=cyan
+          )
+        await ctx.send(embed=embed, delete_after=15)
+
       else:
         raise error
 
