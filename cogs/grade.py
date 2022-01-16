@@ -82,19 +82,19 @@ class Grade(commands.Cog):
           await ctx.guild.ban(warned)
           footer = "User has also been tempbanned for 3d for having 10 warns in the past 3 days. "
 
-        if staff_check(warned):
+        if staff_check(warned, ctx.guild):
 
           if warncount > 2:
 
             staff_rank : discord.Role
 
-            for roleid in staff:
+            for roleid in db['staff'][str(ctx.guild.id)]:
               for role in warned.roles:
                 if roleid == role.id:
                   staff_rank = role
 
             try:
-              demote_role = discord.utils.get(ctx.guild.roles, id=staff[(staff.index(staff_rank.id) + 1)])
+              demote_role = discord.utils.get(ctx.guild.roles, id=db['staff'][str(ctx.guild.id)][(staff.index(staff_rank.id) + 1)])
               await warned.add_roles(demote_role)
               footer = footer + f"Demoted to role of {demote_role.name}"
             except:

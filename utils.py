@@ -19,10 +19,6 @@ client = commands.Bot(command_prefix= prefix)
 
 com = DiscordComponents(client)
 
-gstaff = 
-
-mstaff = 
-
 safe = [622090741862236200, 888373479655751700]
 
 colors = {
@@ -119,9 +115,6 @@ def get_key(val, my_dict):
  
     return "key doesn't exist"
 
-def is_owner(userid):
-  return userid == "622090741862236200"
-
 # Command Checks
 
 def in_guild(guild_id):
@@ -140,9 +133,14 @@ def is_staff():
   return commands.check(predicate)
 
 
-# Mod Stuff ig
+# Mod Stuff 
 
-def staff_check(user: discord.User, guild: discord.Guild):
+def is_owner(user):
+  if isinstance(user, discord.User) or isinstance(user, discord.Member):
+    return user.id == "622090741862236200"
+  return user == "622090741862236200"
+  
+def staff_check(user: discord.Member, guild: discord.Guild):
   for role in user.roles:
       if role.id in db['staff'][str(guild.id)]:
         return True

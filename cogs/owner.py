@@ -116,7 +116,7 @@ class Owner(commands.Cog):
             "author": ctx.author,
             "guild": ctx.guild,
             "message": ctx.message,
-            "private": utils,
+            "utils": utils,
             "game_info": game_info,
             "db":  db
         }

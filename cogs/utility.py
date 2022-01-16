@@ -16,28 +16,28 @@ class Utility(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
-      afk = db['afk']
-      i = True
-      try:
-        for user in afk['server'][str(ctx.guild.id)].keys():
-          if await client.fetch_user(user) in ctx.mentions:
-            embed = discord.Embed(
-              description=f"***{await client.fetch_user(user)}:** `{afk['server'][str(ctx.guild.id)][user]}`*", color=cyan
-            )
-            await ctx.reply(embed=embed)
-            i = False
-      except:
-        pass
-      if i:
-        for user in afk['global'].keys():
-          if await client.fetch_user(user) in ctx.mentions:
-            embed = discord.Embed(
-              description=f"***{await client.fetch_user(user)}:** `{afk['global'][user]}`*", color=cyan
-            )
-            await ctx.reply(embed=embed)
-      
-      if ctx.mentions > 0:
-        if ctx.mentions[0] == client.user:
+            
+      if len(ctx.mentions) > 0:
+
+        afk = db['afk']
+        i = True
+        if ctx.guild.id in afk['server'].keys():
+          for user in afk['server'][str(ctx.guild.id)].keys():
+            if f"<@!{user}>" in ctx.content:
+              embed = discord.Embed(
+                description=f"***{await client.fetch_user(user)}:** `{afk['server'][str(ctx.guild.id)][user]}`*", color=cyan
+              )
+              await ctx.send(embed=embed)
+              i = False
+        if i:
+          for user in afk['global'].keys():
+            if f"<@!{user}>" in ctx.content:
+              embed = discord.Embed(
+                description=f"***{await client.fetch_user(user)}:** `{afk['global'][user]}`*", color=cyan
+              )
+              await ctx.send(embed=embed)
+
+        if ctx.content == client.user.mention:
           await ctx.channel.send(embed=discord.Embed(
             description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
             color=cyan
