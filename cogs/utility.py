@@ -53,26 +53,27 @@ class Utility(commands.Cog):
         
         embed = discord.Embed(title= "__Help List__", description="In the arguments of a command, a `<>` around one means a compulsory argument meanwhile a `[]` around one means an optional argument", color=cyan)
         for cogname in cmds.keys():
-          if cogname == "Mod":
-            if ctx.guild.id == 764060384897925120:
-              embed.add_field(name=f"{cogname} Field", value=f"> {cmds[cogname]['desc']}")
+          if 'guild' in db['help'][cogname].keys():
+            if ctx.guild.id == db['help'][cogname]['guild']:
+              embed.add_field(name=f"{cogname} Field", value=f"> {cmds[cogname]['desc']}", inline=True)
           else:
             embed.add_field(name=f"{cogname} Field", value=f"> {cmds[cogname]['desc']}", inline=True)
         embed.set_footer(text="Specify a field to get command info")
 
       else:
         if field.capitalize() in cmds.keys():
+          if 'guild' not in cmds[field].keys() or ('guild' in cmds[field].keys() and cmds[field]['guild'] == ctx.guild.id):
+            embed = discord.Embed(title=f"__{field.capitalize()} Field__", color=cyan)
+            embed.set_footer(text="Specify a command to get info on only that command")
 
-          embed = discord.Embed(title=f"__{field.capitalize()} Field__", color=cyan)
-          embed.set_footer(text="Specify a command to get info on only that command")
-
-          for cmd in cmds[field.capitalize()]['cmds'].keys():
-            embed.add_field(name=f"{cmd} Command", value=f"> {cmds[field.capitalize()]['cmds'][cmd]}")
+            for cmd in cmds[field.capitalize()]['cmds'].keys():
+              embed.add_field(name=f"{cmd} Command", value=f"> {cmds[field.capitalize()]['cmds'][cmd]}")
         else:
           for cog in cmds.keys():
-            if field.capitalize() in cmds[cog]['cmds'].keys():
-              embed = discord.Embed(title=f"__{field.capitalize()} Command__", description=f"> {cmds[cog]['cmds'][field.capitalize()]}", color=cyan)
-              embed.set_footer(text="lol imagine asking for help")
+            if 'guild' not in cmds[cog].keys() or ('guild' in cmds[cog].keys() and cmds[cog]['guild'] == ctx.guild.id):
+              if (field.capitalize() in cmds[cog]['cmds'].keys()):
+                embed = discord.Embed(title=f"__{field.capitalize()} Command__", description=f"> {cmds[cog]['cmds'][field.capitalize()]}", color=cyan)
+                embed.set_footer(text="lol imagine asking for help")
         
       try:
         await ctx.reply(embed=embed)

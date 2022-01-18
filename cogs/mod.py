@@ -12,8 +12,7 @@ class Mod(commands.Cog):
         self.client = client
 
     def cog_check(self, ctx):
-      perm = ctx.author.permissions_in(ctx.channel)
-      return perm.administator or staff_check(ctx.author, ctx.guild)
+      return ctx.author.permissions_in(ctx.channel).administrator or staff_check(ctx.author, ctx.guild)
 
     # Commands
 
@@ -22,10 +21,13 @@ class Mod(commands.Cog):
 
       s = []
       for sid in staff:
-        s.append(sid)
+        s.append(sid.id)
       db['staff'][str(ctx.guild.id)] = s
-
-      embed = discord.Embed(description=f"The roles `{staff.join(', ')}` will now be able to do staff commands")
+      s = ""
+      for sid in staff:
+        s = s + sid.name + ", "
+      s = s[:-2]
+      embed = discord.Embed(description=f"The role(s) `{s}` will now be able to do staff commands", color=cyan)
       await ctx.send(embed=embed)
       
     
@@ -39,7 +41,7 @@ class Mod(commands.Cog):
         staff.append(role.id)
         db['staff'][str(ctx.guild.id)] = staff
 
-      embed = discord.Embed(description=f"The role `{staff}` will now be able to do staff commands")
+      embed = discord.Embed(description=f"The role `{role}` will now be able to do staff commands", color=cyan)
       await ctx.send(embed=embed)
 
     @commands.command(aliases=['rstaff'])
@@ -49,8 +51,19 @@ class Mod(commands.Cog):
       staff.remove(role.id)
       db['staff'][str(ctx.guild.id)] = staff
 
-      embed = discord.Embed(description=f"The role `{staff}` will no longer be able to do staff commands")
+      embed = discord.Embed(description=f"The role `{role}` will no longer be able to do staff commands", color=cyan)
       await ctx.send(embed=embed)
+    
+    @commands.command(aliases=['slist'])
+    async def stafflist(self, ctx):
+      staff = db['staff'][str(ctx.guild.id)]
+      sname = ""
+      for s in staff:
+        sr = discord.utils.get(ctx.guild.roles, id=s)
+        sname = sname + sr.name + "\n"
+      embed = discord.Embed(description=f"```prolog\n{sname}```", color=cyan)
+      await ctx.send(embed=embed)
+
 
     @commands.command(aliases=['prefix', 'sp'])
     @commands.cooldown(1, 10, commands.BucketType.user)

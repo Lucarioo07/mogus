@@ -183,6 +183,14 @@ class Owner(commands.Cog):
       else:
         await ctx.send("cog not found")
 
+    @commands.command(aliases=['pc'])
+    async def privatecog(self, ctx, cogname):
+      if cogname in db['help'].keys():
+        db['help'][cogname]['guild'] = ctx.guild.id
+
+        await ctx.send(f"The cog `{cogname}` will now only be visible in this server")
+      else:
+        await ctx.send("cog not found")
 
     # Command Help Commands
 

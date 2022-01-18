@@ -112,7 +112,7 @@ async def reload(ctx, extension):
             except commands.ExtensionNotLoaded:
               ded = f"**Cog `{extension}` is currently unloaded**"
             else:
-              ded = f"**`Cog `{extension}` successfully reloaded`**"
+              ded = f"**Cog `{extension}` successfully reloaded**"
 
     embed = discord.Embed(
         description=ded,
