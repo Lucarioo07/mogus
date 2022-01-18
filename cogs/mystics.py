@@ -11,10 +11,12 @@ class Mystics(commands.Cog):
 
     def __init__(self, client):
         self.client = client     
+    
+    def cog_check(self, ctx):
+      return ctx.guild.id == 927259600628088842
 
     # Commands 
 
-    @in_guild(927259600628088842)
     @is_staff()
     @commands.command()
     async def log(self, ctx, win: discord.Member, lose: discord.Member):
@@ -35,7 +37,7 @@ class Mystics(commands.Cog):
       )
       await ctx.reply(embed=embed)
 
-    @in_guild(927259600628088842)
+
     @commands.command(aliases= ['view', 'point'])
     async def viewpoint(self, ctx, user: discord.Member = None):
 
@@ -50,7 +52,7 @@ class Mystics(commands.Cog):
       embed = discord.Embed(description=e, color=cyan)
       await ctx.reply(embed=embed)
     
-    @in_guild(927259600628088842)
+
     @is_staff()
     @commands.command()
     async def editpoint(self, ctx, user: discord.Member, point:int):
@@ -67,7 +69,6 @@ class Mystics(commands.Cog):
       await ctx.reply(embed=embed)
 
 
-    @in_guild(927259600628088842)
     @commands.command(aliases=["lb"])
     async def leaderboard(self, ctx):
       if len(db['points'].keys()) > 0:
@@ -89,7 +90,7 @@ class Mystics(commands.Cog):
       embed = discord.Embed(description=lb, color=cyan)
       await ctx.reply(embed=embed)
 
-    @in_guild(927259600628088842)
+
     @is_staff()
     @commands.command()
     async def reset(self, ctx):

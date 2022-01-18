@@ -63,7 +63,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.MissingPermissions):
           embed = discord.Embed(
             title="Missing Permissions", 
-            description=f"Uhhhh ahaha you actually need the {error.missing_perms} to do this", 
+            description=f"Uhhhh ahaha you actually need the `{error.missing_perms}` to do this", 
             color=cyan
           )
           await ctx.send(embed=embed, delete_after=30)
@@ -71,7 +71,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.BotMissingPermissions):
           embed = discord.Embed(
             title="Bot Missing Permissions", 
-            description=f"hmm i'm not able to do this, ask a staff member to give me the {error.missing_perms} permission", 
+            description=f"hmm i'm not able to do this, ask a staff member to give me the `{error.missing_perms}` permission", 
             color=cyan
           )
           await ctx.send(embed=embed, delete_after=30)
@@ -84,28 +84,13 @@ class Errors(commands.Cog):
           )
           await ctx.send(embed=embed, delete_after=30)
       
-      elif isinstance(error, commands.ExtensionError):
-        
-        if isinstance(error, commands.ExtensionAlreadyLoaded):
-          embed = discord.Embed(
-            description=f"This extension is already loaded", 
-            color=cyan
-          )
-          await ctx.send(embed=embed, delete_after=30)
-
-        elif isinstance(error, commands.ExtensionNotLoaded):
-          embed = discord.Embed(
-            description=f"This extension is not loaded", 
-            color=cyan
-          )
-          await ctx.send(embed=embed, delete_after=30)
-      
       elif isinstance(error, commands.CommandNotFound):
         embed = discord.Embed(
             description=f"This command does not exist, check `{db['prefix'][str(ctx.guild.id)]}help`", 
             color=cyan
           )
-        await ctx.send(embed=embed, delete_after=15)
+        embed.set_footer(text="If you didn't mean to use a command, just ignore this 💀")
+        await ctx.send(embed=embed, delete_after=7.5 )
 
       else:
         raise error

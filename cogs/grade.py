@@ -11,6 +11,9 @@ class Grade(commands.Cog):
         self.client = client
         self.punishmentcheck.start()
 
+    def cog_check(self, ctx):
+      return ctx.guild.id == 764060384897925120
+
     def cog_unload(self):
         self.punishmentcheck.cancel()
 
@@ -35,7 +38,6 @@ class Grade(commands.Cog):
 
     # Commands
     @commands.command()
-    @in_guild(764060384897925120)
     @is_staff()
     async def warn(self, ctx, warned: discord.Member, *, reason):
 
@@ -105,7 +107,6 @@ class Grade(commands.Cog):
         await warned.send(embed=embed)
     
     @commands.command()
-    @in_guild(764060384897925120)
     @is_staff()
     async def delwarn(self, ctx, warn_id):
       try:
@@ -134,7 +135,6 @@ class Grade(commands.Cog):
   
     
     @commands.command()
-    @in_guild(764060384897925120)
     @is_staff()
     async def editwarn(self, ctx, warn_id, new):
       try:
@@ -162,7 +162,6 @@ class Grade(commands.Cog):
       await ctx.send(embed=embed)
 
     @commands.command()
-    @in_guild(764060384897925120)
     @is_staff()
     async def clearwarn(self, ctx, user: discord.User):
       try:
@@ -172,7 +171,6 @@ class Grade(commands.Cog):
         await ctx.send(embed=discord.Embed(description=f"*It appears **`{user}`** doesn't have any warns, but we could fix that...*", color=cyan))
 
     @commands.command(aliases=["warnings", "oopsies"])
-    @in_guild(764060384897925120)
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def warns(self, ctx, user: discord.User= None):
 
@@ -214,8 +212,7 @@ class Grade(commands.Cog):
           embed.description = description
           await ctx.send(embed=embed)
 
-    @commands.command(aliases=['shut'])  
-    @in_guild(764060384897925120)
+    @commands.command(aliases=['shut'])
     @is_staff()
     async def mute(self, ctx, member: discord.Member, timestr='30m'):
 
@@ -256,8 +253,7 @@ class Grade(commands.Cog):
         )
       await ctx.send(embed=embed)
 
-    @commands.command(aliases=['unshut'])  
-    @in_guild(764060384897925120)
+    @commands.command(aliases=['unshut'])
     @is_staff()
     async def unmute(self, ctx, member: discord.Member):
       muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)

@@ -137,10 +137,16 @@ def is_staff():
 
 def is_owner(user):
   if isinstance(user, discord.User) or isinstance(user, discord.Member):
-    return user.id == "622090741862236200"
-  return user == "622090741862236200"
+    return user.id == 622090741862236200
+  else:
+    return user == 622090741862236200
   
 def staff_check(user: discord.Member, guild: discord.Guild):
+  if user is int:
+    user = client.get_user(user)
+  if guild is int:
+    guild = client.get_guild(guild)
+    
   for role in user.roles:
       if role.id in db['staff'][str(guild.id)]:
         return True

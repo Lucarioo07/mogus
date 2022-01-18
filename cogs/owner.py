@@ -1,4 +1,3 @@
-# discord imports
 import discord
 from discord.ext import commands
 # idk
@@ -18,20 +17,18 @@ class Owner(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-
-    # Events
-
+    
+    def cog_check(self, ctx):
+      return is_owner(ctx.author)
 
     # Commands
 
     @commands.command(aliases=["exit", "quit"])
-    @commands.is_owner()
     async def kill(self, ctx):
-        await ctx.send("`Exiting test instance`")
+        await ctx.send("`Bot is now shutting down`")
         await client.close()
 
     @commands.command(aliases=["bb", "ban"])
-    @commands.is_owner()
     async def botban(self, ctx, user: discord.Member):
 
         banned = db["banned"]
@@ -46,7 +43,6 @@ class Owner(commands.Cog):
             await ctx.send("user already banned wheeeeeeee")
 
     @commands.command(aliases=["ubb", "unban"])
-    @commands.is_owner()
     async def unbotban(self, ctx, user: discord.Member):
 
         banned = db["banned"]
@@ -60,7 +56,6 @@ class Owner(commands.Cog):
             await ctx.send("user isnt banned :(")
 
     @commands.command()
-    @commands.is_owner()
     async def banlist(self, ctx):
         banned = db["banned"]
 
@@ -79,7 +74,6 @@ class Owner(commands.Cog):
 
         await ctx.send(embed=discord.Embed(description=benlist, color=cyan))
 
-    @commands.is_owner()
     @commands.command()
     async def tag(self, ctx, user: discord.Member):
         snipe_target = db["snipe_target"]
@@ -90,7 +84,6 @@ class Owner(commands.Cog):
         else:
             await ctx.send(f"**`{user}`** has already been tagged.")
 
-    @commands.is_owner()
     @commands.command()
     async def untag(self, ctx, user: discord.Member):
         snipe_target = db["snipe_target"]
@@ -102,7 +95,6 @@ class Owner(commands.Cog):
             await ctx.send(f"**`{user}`** hasn't been tagged... yet")
 
     @commands.command(name="eval", aliases=["exec"])
-    @commands.is_owner()
     async def _eval(self, ctx, *, code):
         code = clean_code(code)
 
@@ -158,7 +150,6 @@ class Owner(commands.Cog):
     # Cog Help Commands
 
     @commands.command(aliases=['ach'])
-    @commands.is_owner()
     async def addcoghelp(self, ctx, cogname, cogdesc):
 
       db['help'][cogname]= {"desc": cogdesc, "cmds": {}}
@@ -170,7 +161,6 @@ class Owner(commands.Cog):
 
     
     @commands.command(aliases=['ech'])
-    @commands.is_owner()
     async def editcoghelp(self, ctx, cogname, cogdesc):
       if cogname in db['help'].keys():
 
@@ -185,7 +175,6 @@ class Owner(commands.Cog):
         await ctx.send("cog not found")
     
     @commands.command(aliases=['dcgh'])
-    @commands.is_owner()
     async def deletecoghelp(self, ctx, cogname):
 
       if cogname in db['help'].keys():
@@ -198,7 +187,6 @@ class Owner(commands.Cog):
     # Command Help Commands
 
     @commands.command(aliases=['acdh'])
-    @commands.is_owner()
     async def addcmdhelp(self, ctx, cogname, cmdname, cmddesc):
 
       if cogname in db['help'].keys():
@@ -212,7 +200,6 @@ class Owner(commands.Cog):
         await ctx.send("cog not found")
     
     @commands.command(aliases=['ecdh'])
-    @commands.is_owner()
     async def editcmdhelp(self, ctx, cogname, cmdname, cmddesc):
 
       if cogname in db['help'].keys():
@@ -229,7 +216,6 @@ class Owner(commands.Cog):
         await ctx.send("cog not found")
     
     @commands.command(aliases=['dcdh'])
-    @commands.is_owner()
     async def deletecmdhelp(self, ctx, cogname, cmdname):
 
       if cogname in db['help'].keys():

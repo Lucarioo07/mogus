@@ -25,7 +25,7 @@ class Fun(commands.Cog):
 
         snipe_target = db["snipe_target"]
         if ctx.author.id in snipe_target:
-            send = f"> [{after.content}]({after.jump_url}) \n **Before:** `{ctx.content}`"
+            send = f"> {after.content}\n **Before:** `{ctx.content}`"
             send_webhook(send, f"{ctx.author.name} (editsnipe)", ctx.author.avatar_url, await fetch_webhook(ctx.channel))
 
     # Commands
@@ -39,6 +39,18 @@ class Fun(commands.Cog):
         frame(content, user, await fetch_webhook(ctx.channel))
       else:
         frame(content, ctx.author, await fetch_webhook(ctx.channel))
+    
+    @commands.command(aliases=['name'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def names(self, ctx, user: discord.Member, names):
+
+      if names.startswith("remove"):
+        if not staff_check(ctx.author, ctx.guild):
+          embed = discord.Embed(description="Sorry, you can only remove names if you have a staff role.", color=cyan)
+          embed.set_footer(text=f"If you haven't set staff roles in this server yet, use the {db['prefix'][str(ctx.guild.id)]}setstaff command") 
+
+
+      
 
 
 def setup(client):

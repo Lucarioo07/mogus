@@ -16,7 +16,7 @@ class Utility(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
-      if ctx.author != client.user:
+      if not ctx.author.bot:
         afk = db['afk']
         for user in ctx.mentions:
           if str(ctx.guild.id) in afk['server'].keys() and str(user.id) in afk['server'][str(ctx.guild.id)]:
@@ -24,6 +24,7 @@ class Utility(commands.Cog):
               description=f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*", 
               color=cyan
             )
+            embed.set_footer(text=f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message")
             await ctx.reply(embed=embed)
 
           elif str(user.id) in afk['global'].keys():
@@ -107,7 +108,7 @@ class Utility(commands.Cog):
           try:
             db['afk']['server'][str(ctx.guild.id)][str(ctx.author.id)] = m
           except:
-            db['afk']['server'][str(ctx.guild.id)] = {ctx.author.id: m}
+            db['afk']['server'][str(ctx.guild.id)] = {str(ctx.author.id): m}
           desc = f"Your server ping message has been set to `{m}`"
       
       embed = discord.Embed(description=desc, color=cyan)
@@ -144,7 +145,7 @@ class Utility(commands.Cog):
                   tod.append(t)
                   db['todo'][str(ctx.author.id)] = tod
               except:
-                  db['todo'][ctx.author.id] = [t]
+                  db['todo'][str(ctx.author.id)] = [t]
               todo = f"Added entry `{t}` to your list"
 
         elif todo.startswith("remove "):
@@ -175,16 +176,6 @@ class Utility(commands.Cog):
                 todo = "You don't have any entries in your todo list 💀"
               
       embed = discord.Embed(description=todo, color=cyan)
-    
-    @commands.command()
-    @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.has_permissions(manage_guild=True)
-    async def set_prefix(self, ctx, *, prefix):
-      db['prefix'][str(ctx.guild.id)] = prefix
-
-      embed = discord.Embed(description=f"The prefix of this server has been changed to `{prefix}`", color=cyan)
-
-      await ctx.send(embed=embed)
 
 def setup(client):
   client.add_cog(Utility(client))
