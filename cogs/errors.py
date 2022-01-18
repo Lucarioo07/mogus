@@ -68,14 +68,6 @@ class Errors(commands.Cog):
           )
           await ctx.send(embed=embed, delete_after=30)
         
-        elif isinstance(error, commands.BotMissingPermissions):
-          embed = discord.Embed(
-            title="Bot Missing Permissions", 
-            description=f"hmm i'm not able to do this, ask a staff member to give me the `{error.missing_perms}` permission", 
-            color=cyan
-          )
-          await ctx.send(embed=embed, delete_after=30)
-        
         else:
           embed = discord.Embed(
             title="You can't use this command", 
@@ -84,6 +76,15 @@ class Errors(commands.Cog):
           )
           await ctx.send(embed=embed, delete_after=30)
       
+              
+      elif isinstance(error, discord.Forbidden):
+        embed = discord.Embed(
+          title="Bot Missing Permissions", 
+          description=f"hmm i'm not able to do this, ask a staff member to try and fix this", 
+          color=cyan
+        )
+        await ctx.send(embed=embed, delete_after=30)
+
       elif isinstance(error, commands.CommandNotFound):
         embed = discord.Embed(
             description=f"This command does not exist, check `{db['prefix'][str(ctx.guild.id)]}help`", 
