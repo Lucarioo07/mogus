@@ -9,35 +9,13 @@ class Grade(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.punishmentcheck.start()
 
     def cog_check(self, ctx):
       if ctx.guild.id == 764060384897925120:
         return True
       else:
         raise errors.WrongServer()
-
-    def cog_unload(self):
-        self.punishmentcheck.cancel()
-
-    # Tasks
-
-    @tasks.loop(seconds=15.0)
-    async def punishmentcheck(self):
-      now = datetime.datetime.now(dxb_tz)
-      guild = client.get_guild(764060384897925120)
-      muterole = discord.utils.get(guild.roles, id=764060384956383237)
-
-      for timestr in db['punishments']['mute'].values():
-        raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
-        wtime = raw_wtime.replace(tzinfo=dxb_tz)
-        delta = wtime - now
-        if delta.total_seconds() < 0:
-          userid = get_key(timestr, db['punishments']['mute'])
-          member = await guild.fetch_member(userid)
-          await member.remove_roles(muterole)
-          del db['punishments']['mute'][userid]
-
+        
 
     # Commands
     @commands.command()
@@ -215,67 +193,6 @@ class Grade(commands.Cog):
           embed.description = description
           await ctx.send(embed=embed)
 
-    @commands.command(aliases=['shut'])
-    @is_staff()
-    async def mute(self, ctx, member: discord.Member, timestr='30m'):
-
-      try:
-        duration = timestr[:-1] 
-        timetype = timestr[-1]
-
-        if timetype == "m":
-          delta = datetime.timedelta(minutes=int(duration))
-        elif timetype == "h":
-          delta = datetime.timedelta(hours=int(duration))
-        elif timetype == "d":
-          delta = datetime.timedelta(days=int(duration))
-        else:
-          await ctx.send("Invalid time input")
-          return
-      except Exception as e:
-        print(e)
-        await ctx.send("Invalid time input")
-        return
-
-      muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
-
-      if muterole not in member.roles:
-        await member.add_roles(muterole)
-        mtime = datetime.datetime.now(dxb_tz) + delta
-        db['punishments']['mute'][str(member.id)] = mtime.strftime("%d %B %Y, %H:%M")
-  
-        embed = discord.Embed(
-            description=f"***{str(member)}** was muted by **{str(ctx.author)}** for* **`{delta}`**",
-            color=cyan
-        )
-        await member.send(embed=embed)
-      else:
-        embed = discord.Embed(
-            description=f"***{str(member)}** is already muted lmao",
-            color=cyan
-        )
-      await ctx.send(embed=embed)
-
-    @commands.command(aliases=['unshut'])
-    @is_staff()
-    async def unmute(self, ctx, member: discord.Member):
-      muterole = discord.utils.get(ctx.guild.roles, id=764060384956383237)
-
-
-      if muterole in member.roles:
-        await member.remove_roles(muterole)
-        del db['punishments']['mute'][str(member.id)]
-        embed = discord.Embed(
-            description=f"***{str(member)}** was unmuted by **{str(ctx.author)}***",
-            color=cyan
-        )
-      else:
-        embed = discord.Embed(
-            description=f"***{str(member)}** is not muted*",
-            color=cyan
-        )
-      await ctx.send(embed=embed)
-    
 
 def setup(client):
     client.add_cog(Grade(client))

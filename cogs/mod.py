@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from replit import db
 from random import choice
 import os
@@ -10,6 +10,7 @@ class Mod(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        self.punishmentcheck.start()
 
     def cog_check(self, ctx):
       if staff_check(ctx.author, ctx.guild):
@@ -17,57 +18,118 @@ class Mod(commands.Cog):
       else:
         raise errors.NotStaff()
 
+    def cog_unload(self):
+        self.punishmentcheck.cancel()
+
+    # Tasks
+
+    @tasks.loop(seconds=15.0)
+    async def punishmentcheck(self):
+      now = datetime.datetime.now(dxb_tz)
+      
+      for g in db['muterole'].keys():
+        guild = await client.fetch_guild(g)
+        muterole = discord.utils.get(guild.roles, id=db['muterole'][g])
+
+        for timestr in db['punishments']['mute'].values():
+          raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+          wtime = raw_wtime.replace(tzinfo=dxb_tz)
+          delta = wtime - now
+          if delta.total_seconds() < 0:
+            userid = get_key(timestr, db['punishments']['mute'])
+            member = await guild.fetch_member(userid)
+            await member.remove_roles(muterole)
+            del db['punishments']['mute'][userid]
+
+
     # Commands
 
-    @commands.command(aliases=['sstaff'])
-    async def setstaff(self, ctx, *staff: discord.Role):
 
-      s = []
-      for sid in staff:
-        s.append(sid.id)
-      db['staff'][str(ctx.guild.id)] = s
-      s = ""
-      for sid in staff:
-        s = s + sid.name + ", "
-      s = s[:-2]
-      embed = discord.Embed(description=f"The role(s) `{s}` will now be able to do staff commands", color=cyan)
-      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
-      await ctx.send(embed=embed)
-      
-    
-    @commands.command(aliases=['astaff'])
-    async def addstaff(self, ctx, role: discord.Role):
+    @commands.command(aliases=['shut'])
+    async def mute(self, ctx, member: discord.Member, timestr='30m'):
 
-      if str(ctx.guild.id) not in db['staff'].keys():
-        db['staff'][str(ctx.guild.id)] = [role.id]
+      try:
+        duration = timestr[:-1] 
+        timetype = timestr[-1]
+
+        if timetype == "m":
+          delta = datetime.timedelta(minutes=int(duration))
+        elif timetype == "h":
+          delta = datetime.timedelta(hours=int(duration))
+        elif timetype == "d":
+          delta = datetime.timedelta(days=int(duration))
+        else:
+          await ctx.send("Invalid time input")
+          return
+      except Exception as e:
+        print(e)
+        await ctx.send("Invalid time input")
+        return
+
+      try:
+        muterole = discord.utils.get(ctx.guild.roles, id=db['muterole'][str(ctx.guild.id)])
+      except:
+        embed=discord.Embed(
+          description=f"This server doesn't have a muterole, make one using `{db['prefix'][str(ctx.guild.id)]}muterole`",
+          color=cyan
+        )
+        await ctx.reply(embed=embed)
+        return
+
+      if muterole not in member.roles:
+        await member.add_roles(muterole)
+        mtime = datetime.datetime.now(dxb_tz) + delta
+        db['punishments']['mute'][str(member.id)] = mtime.strftime("%d %B %Y, %H:%M")
+  
+        embed = discord.Embed(
+            description=f"***{str(member)}** was muted by **{str(ctx.author)}** for* **`{delta}`**",
+            color=cyan
+        )
+        await member.send(embed=embed)
       else:
-        staff = db['staff'][str(ctx.guild.id)]
-        staff.append(role.id)
-        db['staff'][str(ctx.guild.id)] = staff
-
-      embed = discord.Embed(description=f"The role `{role}` will now be able to do staff commands", color=cyan)
-      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
+        embed = discord.Embed(
+            description=f"***{str(member)}** is already muted lmao",
+            color=cyan
+        )
       await ctx.send(embed=embed)
 
-    @commands.command(aliases=['rstaff'])
-    async def removestaff(self, ctx, role: discord.Role):
-      
-      staff = db['staff'][str(ctx.guild.id)]
-      staff.remove(role.id)
-      db['staff'][str(ctx.guild.id)] = staff
 
-      embed = discord.Embed(description=f"The role `{role}` will no longer be able to do staff commands", color=cyan)
-      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
+    @commands.command(aliases=['unshut'])
+    async def unmute(self, ctx, member: discord.Member):
+
+      try:
+        muterole = discord.utils.get(ctx.guild.roles, id=db['muterole'][str(ctx.guild.id)])
+      except:
+        embed=discord.Embed(
+          description=f"This server doesn't have a muterole, make one using `{db['prefix'][str(ctx.guild.id)]}muterole`",
+          color=cyan
+        )
+        await ctx.reply(embed=embed)
+        return
+
+      if muterole in member.roles:
+        await member.remove_roles(muterole)
+        del db['punishments']['mute'][str(member.id)]
+        embed = discord.Embed(
+            description=f"***{str(member)}** was unmuted by **{str(ctx.author)}***",
+            color=cyan
+        )
+      else:
+        embed = discord.Embed(
+            description=f"***{str(member)}** is not muted*",
+            color=cyan
+        )
       await ctx.send(embed=embed)
     
-    @commands.command(aliases=['slist'])
-    async def stafflist(self, ctx):
-      staff = db['staff'][str(ctx.guild.id)]
-      sname = ""
-      for s in staff:
-        sr = discord.utils.get(ctx.guild.roles, id=s)
-        sname = sname + sr.name + "\n"
-      embed = discord.Embed(description=f"```prolog\n{sname}```", color=cyan)
+    @commands.command()
+    async def muterole(self, ctx, muterole: discord.Role):
+
+      db['muterole'][ctx.guild.id] = muterole.id
+
+      embed = discord.Embed(
+        description=f"You've set the role `{muterole}` to be the muterole",
+        color=cyan
+        )
       await ctx.send(embed=embed)
 
 
@@ -79,6 +141,7 @@ class Mod(commands.Cog):
 
       embed = discord.Embed(description=f"The prefix of this server has been changed to `{prefix}`", color=cyan)
       await ctx.send(embed=embed)
+
 
     @commands.command(aliases=['mr'])
     async def modifyroles(self, ctx, user: discord.Member, *roles):
@@ -135,7 +198,60 @@ class Mod(commands.Cog):
         embed = discord.Embed(description=f"The role `{e.argument}` couldn't be found", color=cyan)
         embed.set_footer(text="Make sure to keep spaces between each of the role names, and the '|'")
         await ctx.reply(embed=embed)
+    
 
+    @commands.command(aliases=['sstaff'])
+    async def setstaff(self, ctx, *staff: discord.Role):
+
+      s = []
+      for sid in staff:
+        s.append(sid.id)
+      db['staff'][str(ctx.guild.id)] = s
+      s = ""
+      for sid in staff:
+        s = s + sid.name + ", "
+      s = s[:-2]
+      embed = discord.Embed(description=f"The role(s) `{s}` will now be able to do staff commands", color=cyan)
+      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
+      await ctx.send(embed=embed)
+      
+    
+    @commands.command(aliases=['astaff'])
+    async def addstaff(self, ctx, role: discord.Role):
+
+      if str(ctx.guild.id) not in db['staff'].keys():
+        db['staff'][str(ctx.guild.id)] = [role.id]
+      else:
+        staff = db['staff'][str(ctx.guild.id)]
+        staff.append(role.id)
+        db['staff'][str(ctx.guild.id)] = staff
+
+      embed = discord.Embed(description=f"The role `{role}` will now be able to do staff commands", color=cyan)
+      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
+      await ctx.send(embed=embed)
+
+
+    @commands.command(aliases=['rstaff'])
+    async def removestaff(self, ctx, role: discord.Role):
+      
+      staff = db['staff'][str(ctx.guild.id)]
+      staff.remove(role.id)
+      db['staff'][str(ctx.guild.id)] = staff
+
+      embed = discord.Embed(description=f"The role `{role}` will no longer be able to do staff commands", color=cyan)
+      embed.set_footer(text="Having the administrator permission will let you do all staff commands")
+      await ctx.send(embed=embed)
+    
+
+    @commands.command(aliases=['slist'])
+    async def stafflist(self, ctx):
+      staff = db['staff'][str(ctx.guild.id)]
+      sname = ""
+      for s in staff:
+        sr = discord.utils.get(ctx.guild.roles, id=s)
+        sname = sname + sr.name + "\n"
+      embed = discord.Embed(description=f"```prolog\n{sname}```", color=cyan)
+      await ctx.send(embed=embed)
 
 def setup(client):
     client.add_cog(Mod(client))

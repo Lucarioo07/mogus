@@ -154,7 +154,7 @@ class Owner(commands.Cog):
       fake = copy(ctx.message)
       fake.author = user
       fake.content = ctx.prefix + msg
-      await self.bot.process_commands(fake)
+      await self.client.process_commands(fake)
 
     # _HELP EDIT COMMANDS_
 
