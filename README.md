@@ -11,9 +11,10 @@
 ###### Original Dragonball-Z Game
   - ummm.. not exactly factually correct but yeah
   - Tutorial and info provided in the `info` command
-###### Creative Moderation Solutions
-  - Currently for a private server
-  - I'm planning on making it public after a while
+###### Moderation 
+  - Currently working on making original moderation commands (and obviously some normal required ones)
 ###### Utility
   - A command to send a message when you get pinged, kinda like AFK but doesn't time out.
   - To-do list command 
+###### Private Server Stuff
+  - Commands for private servers, including customised moderation, etc.
