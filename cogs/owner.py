@@ -6,11 +6,13 @@ import utils
 import game_info
 import os
 from replit import db
+from traceback import format_exception
+from copy import copy
 # eval
 import io
 import contextlib
 import textwrap
-from traceback import format_exception
+
 
 
 class Owner(commands.Cog):
@@ -146,6 +148,13 @@ class Owner(commands.Cog):
 
             await pager.start(ctx)
     
+    @commands.command()
+    async def sudo(self, ctx, user: discord.Member, *, msg):
+    
+      fake = copy(ctx.message)
+      fake.author = user
+      fake.content = ctx.prefix + msg
+      await self.bot.process_commands(fake)
 
     # _HELP EDIT COMMANDS_
 
@@ -238,7 +247,6 @@ class Owner(commands.Cog):
         await ctx.send("cog not found")
     
     
-
 
 def setup(client):
     client.add_cog(Owner(client))

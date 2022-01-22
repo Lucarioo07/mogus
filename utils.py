@@ -16,8 +16,6 @@ async def prefix(client, message):
   return db['prefix'][str(message.guild.id)]
   
 client = commands.Bot(command_prefix= prefix)  
-
-
 com = DiscordComponents(client)
 
 safe = [622090741862236200, 888373479655751700]

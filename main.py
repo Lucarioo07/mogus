@@ -11,6 +11,10 @@ client.remove_command("help")
 
 @client.event
 async def on_ready():
+
+    if not is_owner(discord.AppInfo.owner):
+      await client.close()
+
     activity = discord.Game(name=">help")
     await client.change_presence(activity=activity, status=discord.Status.dnd)
 

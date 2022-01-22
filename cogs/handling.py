@@ -124,7 +124,7 @@ class Handling(commands.Cog):
       else:
         if is_owner(ctx.author):
           result = "".join(format_exception(error, error, error.__traceback__))
-          embed = discord.Embed(description=f"```\n{result}\n```", color=cyan)
+          embed = discord.Embed(description=f"```py\n{result}```", color=cyan)
           await ctx.reply(embed=embed, delete_after=30)
         else:
           raise error
