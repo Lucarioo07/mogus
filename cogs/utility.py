@@ -25,21 +25,21 @@ class Utility(commands.Cog):
               color=cyan
             )
             embed.set_footer(text=f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message")
-            await ctx.reply(embed=embed)
+            await ctx.reply(embed=embed, delete_after=15)
 
           elif str(user.id) in afk['global'].keys():
             embed = discord.Embed(
               description=f"***{user}:** `{afk['global'][str(user.id)]}`*", 
               color=cyan
             )
-            await ctx.reply(embed=embed)
+            await ctx.reply(embed=embed, delete_after=15)
 
           if user == client.user:
             embed = discord.Embed(
               description=f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
               color=cyan
               )
-            await ctx.reply(embed=embed)
+            await ctx.reply(embed=embed, delete_after=15)
 
 
     # Commands
@@ -62,7 +62,7 @@ class Utility(commands.Cog):
 
       else:
         if field.capitalize() in cmds.keys():
-          if 'guild' not in cmds[field].keys() or ('guild' in cmds[field].keys() and cmds[field]['guild'] == ctx.guild.id):
+          if 'guild' not in cmds[field.capitalize()].keys() or ('guild' in cmds[field.capitalize()].keys() and cmds[field.capitalize()]['guild'] == ctx.guild.id):
             embed = discord.Embed(title=f"__{field.capitalize()} Field__", color=cyan)
             embed.set_footer(text="Specify a command to get info on only that command")
 

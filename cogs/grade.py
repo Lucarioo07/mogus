@@ -12,7 +12,10 @@ class Grade(commands.Cog):
         self.punishmentcheck.start()
 
     def cog_check(self, ctx):
-      return ctx.guild.id == 764060384897925120
+      if ctx.guild.id == 764060384897925120:
+        return True
+      else:
+        raise errors.WrongServer()
 
     def cog_unload(self):
         self.punishmentcheck.cancel()

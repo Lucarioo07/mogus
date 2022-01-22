@@ -7,6 +7,7 @@ import datetime
 import pytz
 from replit import db
 import os
+import errors
 
 bot_token = os.environ['bot_token']
 
@@ -119,17 +120,26 @@ def get_key(val, my_dict):
 
 def in_guild(guild_id):
       async def predicate(ctx):
-          return ctx.guild and ctx.guild.id == guild_id
+          if ctx.guild and ctx.guild.id == guild_id:
+            return True
+          else:
+            raise errors.WrongServer()
       return commands.check(predicate)
     
 def is_not_banned():
   async def predicate(ctx):
-    return ctx.author.id not in db['banned']
+    if ban_check(ctx.author):
+      return True
+    else:
+      raise errors.UserBanned()
   return commands.check(predicate)
 
 def is_staff():
   async def predicate(ctx):
-    return staff_check(ctx.author, ctx.guild)
+    if staff_check(ctx.author, ctx.guild):
+      return True
+    else:
+      raise errors.NotStaff()
   return commands.check(predicate)
 
 
@@ -140,7 +150,13 @@ def is_owner(user):
     return user.id == 622090741862236200
   else:
     return user == 622090741862236200
-  
+
+def ban_check(user):
+  if isinstance(user, discord.User) or isinstance(user, discord.Member):
+    return user.id not in db['banned']
+  else:
+    return user not in db['banned']
+
 def staff_check(user: discord.Member, guild: discord.Guild):
   if user is int:
     user = client.get_user(user)
@@ -148,7 +164,7 @@ def staff_check(user: discord.Member, guild: discord.Guild):
     guild = client.get_guild(guild)
     
   for role in user.roles:
-      if role.id in db['staff'][str(guild.id)]:
+      if role.id in db['staff'][str(guild.id)] or role.permissions.administrator:
         return True
 
 def recent_warns(user, guild):

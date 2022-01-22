@@ -4,6 +4,7 @@ from replit import db
 from random import choice
 import os
 from utils import *
+import errors
 
 
 class Fun(commands.Cog):
@@ -39,15 +40,17 @@ class Fun(commands.Cog):
         frame(content, user, await fetch_webhook(ctx.channel))
       else:
         frame(content, ctx.author, await fetch_webhook(ctx.channel))
-    
+
+    """
     @commands.command(aliases=['name'])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def names(self, ctx, user: discord.Member, names):
+    @commands
+    async def names(self, ctx, user: discord.Member, name):
 
       if names.startswith("remove"):
         if not staff_check(ctx.author, ctx.guild):
-          embed = discord.Embed(description="Sorry, you can only remove names if you have a staff role.", color=cyan)
-          embed.set_footer(text=f"If you haven't set staff roles in this server yet, use the {db['prefix'][str(ctx.guild.id)]}setstaff command") 
+          raise errors.NotStaff(ctx.author)
+    """
 
 
       

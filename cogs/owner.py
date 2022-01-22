@@ -19,7 +19,10 @@ class Owner(commands.Cog):
         self.client = client
     
     def cog_check(self, ctx):
-      return is_owner(ctx.author)
+      if is_owner(ctx.author):
+        return True
+      else:
+        raise commands.NotOwner()
 
     # Commands
 
@@ -28,11 +31,10 @@ class Owner(commands.Cog):
         await ctx.send("`Bot is now shutting down`")
         await client.close()
 
-    @commands.command(aliases=["bb", "ban"])
+    @commands.command(aliases=["bb"])
     async def botban(self, ctx, user: discord.Member):
 
         banned = db["banned"]
-        print(banned)
 
         if user.id not in banned:
             banned.append(user.id)

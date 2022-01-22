@@ -11,7 +11,7 @@ client.remove_command("help")
 
 @client.event
 async def on_ready():
-    activity=discord.Game(name=">help")
+    activity = discord.Game(name=">help")
     await client.change_presence(activity=activity, status=discord.Status.dnd)
 
     for filename in os.listdir('./cogs'):
@@ -23,8 +23,8 @@ async def on_ready():
 
 @client.event
 async def on_guild_join(guild):
-  if str(guild.id) not in db['prefix'].keys():
-    db['prefix'][str(guild.id)] = ">"
+    if str(guild.id) not in db['prefix'].keys():
+        db['prefix'][str(guild.id)] = ">"
 
 
 @client.command()
@@ -35,9 +35,9 @@ async def load(ctx, extension):
         for filename in os.listdir('./cogs'):
             if filename.endswith(".py"):
                 try:
-                  client.load_extension(f"cogs.{filename[:-3]}")
+                    client.load_extension(f"cogs.{filename[:-3]}")
                 except commands.ExtensionAlreadyLoaded:
-                  client.reload_extension(f"cogs.{filename[:-3]}")     
+                    client.reload_extension(f"cogs.{filename[:-3]}")
 
         ded = "**`All Cogs successfully loaded`**"
     else:
@@ -45,18 +45,15 @@ async def load(ctx, extension):
             ded = "`Not a valid cog`"
         else:
             try:
-              client.load_extension(f"cogs.{extension}")
+                client.load_extension(f"cogs.{extension}")
             except commands.ExtensionAlreadyLoaded:
-              ded = f"**Cog `{extension}` is already loaded**"
+                ded = f"**Cog `{extension}` is already loaded**"
             else:
-              ded = f"**Cog `{extension}` successfully loaded`**"
+                ded = f"**Cog `{extension}` successfully loaded`**"
 
-    embed = discord.Embed(
-        description=ded,
-        color=cyan
-    )
+    embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
-  
+
 
 @client.command()
 @commands.is_owner()
@@ -65,9 +62,9 @@ async def unload(ctx, extension):
         for filename in os.listdir('./cogs'):
             if filename.endswith(".py"):
                 try:
-                  client.unload_extension(f"cogs.{filename[:-3]}")
+                    client.unload_extension(f"cogs.{filename[:-3]}")
                 except commands.ExtensionNotLoaded:
-                  pass
+                    pass
 
         ded = "**`All Cogs successfully unloaded`**"
     else:
@@ -75,16 +72,13 @@ async def unload(ctx, extension):
             ded = "`Not a valid cog`"
         else:
             try:
-              client.unload_extension(f'cogs.{extension}')
+                client.unload_extension(f'cogs.{extension}')
             except commands.ExtensionNotLoaded:
-              ded = f"**Cog `{extension}` is already unloaded**"
+                ded = f"**Cog `{extension}` is already unloaded**"
             else:
-              ded = f"**Cog `{extension}` successfully unloaded**"
+                ded = f"**Cog `{extension}` successfully unloaded**"
 
-    embed = discord.Embed(
-        description=ded,
-        color=cyan
-    )
+    embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
 
 
@@ -95,35 +89,33 @@ async def reload(ctx, extension):
         for filename in os.listdir('./cogs'):
             if filename.endswith(".py"):
                 try:
-                  client.unload_extension(f"cogs.{filename[:-3]}")
+                    client.unload_extension(f"cogs.{filename[:-3]}")
                 except commands.ExtensionNotLoaded:
-                  pass
+                    pass
                 finally:
-                  client.load_extension(f"cogs.{filename[:-3]}")
-                  
+                    client.load_extension(f"cogs.{filename[:-3]}")
+
         ded = "**`All Cogs successfully reloaded`**"
     else:
         if f"{extension}.py" not in os.listdir("./cogs"):
             ded = "`Not a valid cog`"
         else:
             try:
-              client.unload_extension(f'cogs.{extension}')
-              client.load_extension(f"cogs.{extension}")
+                client.unload_extension(f'cogs.{extension}')
+                client.load_extension(f"cogs.{extension}")
             except commands.ExtensionNotLoaded:
-              ded = f"**Cog `{extension}` is currently unloaded**"
+                ded = f"**Cog `{extension}` is currently unloaded**"
             else:
-              ded = f"**Cog `{extension}` successfully reloaded**"
+                ded = f"**Cog `{extension}` successfully reloaded**"
 
-    embed = discord.Embed(
-        description=ded,
-        color=cyan
-    )
+    embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
 
 
 @client.command()
 async def ping(ctx):
-    await ctx.send(f'Ping of main instance is `{round(client.latency * 1000)}ms` 🏓')
+    await ctx.send(
+        f'Ping of main instance is `{round(client.latency * 1000)}ms` 🏓')
 
 
 keep_alive()

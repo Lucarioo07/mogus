@@ -5,9 +5,11 @@ from random import choice
 import os
 from utils import *
 import time
+from traceback import format_exception
+import errors
 
 
-class Errors(commands.Cog):
+class Handling(commands.Cog):
 
     def __init__(self, client):
         self.client = client
@@ -68,10 +70,36 @@ class Errors(commands.Cog):
           )
           await ctx.send(embed=embed, delete_after=30)
         
+        elif isinstance(error, errors.WrongServer):
+          embed = discord.Embed(
+            title="Not available",
+            description=f"This command cannot be used in this server", 
+            color=cyan
+          )
+          embed.set_footer(text="If you didn't mean to use a command, just ignore this 💀")
+          await ctx.send(embed=embed, delete_after=7.5)
+        
+        elif isinstance(error, errors.NotStaff):
+          embed = discord.Embed(
+            title="Missing Permissions",
+            description=f"lmao loser you need a staff role to use this command", 
+            color=cyan
+          )
+          await ctx.send(embed=embed, delete_after=30)
+        
+        elif isinstance(error, errors.UserBanned):
+          embed = discord.Embed(
+            title="That moment when banned",
+            description=f"You've been botbanned, and cannot use this command. Appeal to the bot owner if you want to be bot banned (but dont overdo it or you'll get blocked too)", 
+            color=cyan
+          )
+          embed.set_footer(text="lollers")
+          await ctx.send(embed=embed, delete_after=15)
+
         else:
           embed = discord.Embed(
             title="You can't use this command", 
-            description="this command for non-normies only, sorry (maybe)", 
+            description="something went wrong when you tried to use this command", 
             color=cyan
           )
           await ctx.send(embed=embed, delete_after=30)
@@ -94,8 +122,14 @@ class Errors(commands.Cog):
         await ctx.send(embed=embed, delete_after=7.5 )
 
       else:
-        raise error
+        if is_owner(ctx.author):
+          result = "".join(format_exception(error, error, error.__traceback__))
+          embed = discord.Embed(description=f"```\n{result}\n```", color=cyan)
+          await ctx.reply(embed=embed, delete_after=30)
+        else:
+          raise error
+
 
 
 def setup(client):
-    client.add_cog(Errors(client))
+    client.add_cog(Handling(client))

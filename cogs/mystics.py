@@ -13,7 +13,10 @@ class Mystics(commands.Cog):
         self.client = client     
     
     def cog_check(self, ctx):
-      return ctx.guild.id == 927259600628088842
+      if ctx.guild.id == 927259600628088842:
+        return True
+      else:
+        raise errors.WrongServer
 
     # Commands 
 

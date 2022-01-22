@@ -12,7 +12,10 @@ class Mod(commands.Cog):
         self.client = client
 
     def cog_check(self, ctx):
-      return ctx.author.permissions_in(ctx.channel).administrator or staff_check(ctx.author, ctx.guild)
+      if staff_check(ctx.author, ctx.guild):
+        return True
+      else:
+        raise errors.NotStaff()
 
     # Commands
 
