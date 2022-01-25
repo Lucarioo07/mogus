@@ -85,9 +85,11 @@ class Utility(commands.Cog):
     async def afk(self, ctx, *, message):
 
       desc = ""
+      if "\n" in message:
+        message = message[:message.rfind("\n")]
 
       if message.startswith("global"):
-        m = message.replace("global ", "")
+        m = message[6:]
         if m == "remove":
           try:
             del db['afk']['global'][str(ctx.author.id)]

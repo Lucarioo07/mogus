@@ -5,6 +5,7 @@ from random import choice
 import os
 from utils import *
 import time
+import errors
 
 
 class Mystics(commands.Cog):
@@ -74,24 +75,23 @@ class Mystics(commands.Cog):
 
     @commands.command(aliases=["lb"])
     async def leaderboard(self, ctx):
-      if len(db['points'].keys()) > 0:
-        asc = [] 
-        for i in db['points'].keys():
-          asc.append(int(db['points'][i]))
-        asc.sort(reverse=True)
+
+      m = await ctx.reply(embed=discord.Embed(description="wait two seconds, fetching leaderboard...", color=cyan))
+      s = list(db['points'].keys())
+      if len(s) > 0:
+        asc = sorted(s, key=lambda k: db['points'][k], reverse=True)
 
         lb = "```prolog\n"
         i = 1
-        for v in asc:
-          uid = get_key(v, db['points'])
-          lb += f"{i}. {await client.fetch_user(uid)} : {v}\n"
+        for uid in asc:
+          lb += f"{i}. {await client.fetch_user(int(uid))} : {db['points'][uid]}\n"
           i += 1
         lb += "```"
       else:
         lb = "br no one has any points yet"
         
       embed = discord.Embed(description=lb, color=cyan)
-      await ctx.reply(embed=embed)
+      await m.edit(embed=embed)
 
 
     @is_staff()
