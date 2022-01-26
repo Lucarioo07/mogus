@@ -26,10 +26,11 @@ class Owner(commands.Cog):
 
     # Commands
 
-    @commands.command(aliases=["exit", "quit"])
-    async def kill(self, ctx):
-        await ctx.send("`Bot is now shutting down`")
-        await client.close()
+    @commands.command(aliases=["lockdown"])
+    async def lock(self, ctx, l:bool = True):
+        await ctx.send(f"`Lock status has been updated to {l}`")
+        db['lock'] = l
+    
 
     @commands.command(aliases=["bb"])
     async def botban(self, ctx, user: discord.Member):

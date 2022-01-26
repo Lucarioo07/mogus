@@ -5,6 +5,7 @@ from utils import *
 from keep_alive import keep_alive
 import os
 from replit import db
+import errors
 
 client.remove_command("help")
 
@@ -26,6 +27,12 @@ async def on_ready():
 async def on_guild_join(guild):
     if str(guild.id) not in db['prefix'].keys():
         db['prefix'][str(guild.id)] = ">"
+
+
+@client.check
+async def global_checks(ctx):
+    if disabled_check(ctx) or locked_check():
+        return True
 
 
 @client.command()

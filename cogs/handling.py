@@ -94,6 +94,16 @@ class Handling(commands.Cog):
                 embed.set_footer(text="lollers")
                 await ctx.send(embed=embed, delete_after=15)
 
+            elif isinstance(error, errors.CommandDisabled):
+                embed = discord.Embed(
+                    title="Command Disabled",
+                    description=
+                    "This command is disabled in this server, ask a staff member to enable it again",
+                    color=cyan
+                )
+                embed.set_footer(text="imagine disabling it in the first place")
+                await ctx.send(embed=embed)
+
             else:
                 embed = discord.Embed(
                     title="You can't use this command",

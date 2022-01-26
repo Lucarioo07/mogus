@@ -152,7 +152,7 @@ def is_staff():
     return commands.check(predicate)
 
 
-# Mod Stuff
+# Checks and Mod Stuff
 
 
 def is_owner(user):
@@ -179,6 +179,20 @@ def staff_check(user: discord.Member, guild: discord.Guild):
         if role.id in db['staff'][str(
                 guild.id)] or role.permissions.administrator:
             return True
+
+
+def disabled_check(guild: discord.Guild, cmd):
+    if str(guild.id) in db['disabled'] and cmd in [i for i in db['disabled'][str(guild.id)]]:
+        raise errors.CommandDisabled
+    else:
+        return True
+
+
+def locked_check():
+    if db['locked']:
+        raise errors.BotLocked()
+    else:
+        return True
 
 
 def recent_warns(user, guild):

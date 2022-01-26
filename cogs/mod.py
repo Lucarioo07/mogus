@@ -207,6 +207,48 @@ class Mod(commands.Cog):
             )
             await ctx.reply(embed=embed)
 
+    @commands.command(aliases=["dc"])
+    async def disablecommand(self, ctx, command):
+        if command == "enablecommand":
+            await ctx.reply("nice try, but you can't disable enablecommand 🤡")
+            return
+        elif str(ctx.guild.id) not in db['disabled'].keys():
+            db['disabled'][str(ctx.guild.id)] = []
+        elif command in db['disabled'][str(ctx.guild.id)]:
+            await ctx.reply("this command is already disabled f")
+            return
+
+        if command in [i.name for i in client.commands]:
+            l = db['disabled'][str(ctx.guild.id)]
+            l.append(command)
+            db['disabled'][str(ctx.guild.id)] = l
+
+            embed = discord.Embed(
+                description=f"The command `{command}` has been successfully disabled.",
+                color=cyan)
+            await ctx.send(embed=embed)
+    
+    @commands.command(aliases=["ec"])
+    async def enablecommand(self, ctx, command):
+
+        if str(ctx.guild.id) not in db['disabled'].keys():
+            db['disabled'][str(ctx.guild.id)] = []
+            await ctx.reply("This command wasn't disabled in the first place")
+            return
+        elif command not in db['disabled'][str(ctx.guild.id)]:
+            await ctx.reply("this command wasn't disabled in the first place")
+            return
+
+        if command in [i.name for i in client.commands]:
+            l = db['disabled'][str(ctx.guild.id)]
+            l.remove(command)
+            db['disabled'][str(ctx.guild.id)] = l
+
+            embed = discord.Embed(
+                description=f"The command `{command}` has been successfully enabled.",
+                color=cyan)
+            await ctx.send(embed=embed)
+
     @commands.command(aliases=['sstaff'])
     async def setstaff(self, ctx, *staff: discord.Role):
 
