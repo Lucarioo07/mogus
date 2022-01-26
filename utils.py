@@ -13,9 +13,10 @@ bot_token = os.environ['bot_token']
 
 
 async def prefix(client, message):
-  return db['prefix'][str(message.guild.id)]
-  
-client = commands.Bot(command_prefix= prefix)  
+    return db['prefix'][str(message.guild.id)]
+
+
+client = commands.Bot(command_prefix=prefix)
 com = DiscordComponents(client)
 
 safe = [622090741862236200, 888373479655751700]
@@ -42,6 +43,7 @@ colors = {
     "DARK_NAVY": 0x2C3E50,
 }
 cyan = 65486
+
 
 async def fetch_webhook(channel: discord.TextChannel):
     global webhook
@@ -73,6 +75,7 @@ def frame(content, user, hook):
     except requests.exceptions.HTTPError as err:
         print(err)
 
+
 def send_webhook(content, name, avatar, hook):
     data = {
         "content": content,
@@ -94,9 +97,9 @@ def send_webhook(content, name, avatar, hook):
 def clean_code(content):
 
     if content.startswith("```") and content.endswith("```"):
-      return "\n".join(content.split("\n")[1:])[:-3]
+        return "\n".join(content.split("\n")[1:])[:-3]
     else:
-      return content
+        return content
 
 
 class Pag(Paginator):
@@ -106,82 +109,95 @@ class Pag(Paginator):
         except discord.HTTPException:
             pass
 
+
 def get_key(val, my_dict):
-  
+
     for key, value in my_dict.items():
-         if val == value:
-             return key
- 
+        if val == value:
+            return key
+
     return "key doesn't exist"
+
 
 # Command Checks
 
+
 def in_guild(guild_id):
-      async def predicate(ctx):
-          if ctx.guild and ctx.guild.id == guild_id:
+    async def predicate(ctx):
+        if ctx.guild and ctx.guild.id == guild_id:
             return True
-          else:
+        else:
             raise errors.WrongServer()
-      return commands.check(predicate)
-    
+
+    return commands.check(predicate)
+
+
 def is_not_banned():
-  async def predicate(ctx):
-    if ban_check(ctx.author):
-      return True
-    else:
-      raise errors.UserBanned()
-  return commands.check(predicate)
+    async def predicate(ctx):
+        if ban_check(ctx.author):
+            return True
+        else:
+            raise errors.UserBanned()
+
+    return commands.check(predicate)
+
 
 def is_staff():
-  async def predicate(ctx):
-    if staff_check(ctx.author, ctx.guild):
-      return True
-    else:
-      raise errors.NotStaff()
-  return commands.check(predicate)
+    async def predicate(ctx):
+        if staff_check(ctx.author, ctx.guild):
+            return True
+        else:
+            raise errors.NotStaff()
+
+    return commands.check(predicate)
 
 
-# Mod Stuff 
+# Mod Stuff
+
 
 def is_owner(user):
-  if isinstance(user, discord.User) or isinstance(user, discord.Member):
-    return user.id == 622090741862236200
-  else:
-    return user == 622090741862236200
+    if isinstance(user, discord.User) or isinstance(user, discord.Member):
+        return user.id == 622090741862236200
+    else:
+        return user == 622090741862236200
+
 
 def ban_check(user):
-  if isinstance(user, discord.User) or isinstance(user, discord.Member):
-    return user.id not in db['banned']
-  else:
-    return user not in db['banned']
+    if isinstance(user, discord.User) or isinstance(user, discord.Member):
+        return user.id not in db['banned']
+    else:
+        return user not in db['banned']
+
 
 def staff_check(user: discord.Member, guild: discord.Guild):
-  if user is int:
-    user = client.get_user(user)
-  if guild is int:
-    guild = client.get_guild(guild)
-    
-  for role in user.roles:
-      if role.id in db['staff'][str(guild.id)] or role.permissions.administrator:
-        return True
+    if user is int:
+        user = client.get_user(user)
+    if guild is int:
+        guild = client.get_guild(guild)
+
+    for role in user.roles:
+        if role.id in db['staff'][str(
+                guild.id)] or role.permissions.administrator:
+            return True
+
 
 def recent_warns(user, guild):
-  count = 0
-  now = datetime.datetime.now()
-  for warn in db['warns'][str(guild)][str(user)].values():
-    timestr = warn['time']
-    wtime = datetime.datetime.strptime(timestr, "%d %B %Y")
-    delta = now - wtime
-    if delta.days < 4:
-      count += 1
-  return count
-    
+    count = 0
+    now = datetime.datetime.now()
+    for warn in db['warns'][str(guild)][str(user)].values():
+        timestr = warn['time']
+        wtime = datetime.datetime.strptime(timestr, "%d %B %Y")
+        delta = now - wtime
+        if delta.days < 4:
+            count += 1
+    return count
+
+
 pun = {
-  "30m": datetime.timedelta(minutes=30),
-  "1h": datetime.timedelta(hours= 1),
-  "1d": datetime.timedelta(days= 1),
-  "3d": datetime.timedelta(days= 3)
+    "30m": datetime.timedelta(minutes=30),
+    "1h": datetime.timedelta(hours=1),
+    "1d": datetime.timedelta(days=1),
+    "3d": datetime.timedelta(days=3)
 }
 
 dxb_tz = pytz.timezone("Asia/Dubai")
-

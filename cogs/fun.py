@@ -8,7 +8,6 @@ import errors
 
 
 class Fun(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -19,15 +18,19 @@ class Fun(commands.Cog):
 
         snipe_target = db["snipe_target"]
         if ctx.author.id in snipe_target:
-            send_webhook(ctx.content, f"{ctx.author.name} (snipe)", ctx.author.avatar_url, await fetch_webhook(ctx.channel))
-    
+            send_webhook(ctx.content, f"{ctx.author.name} (snipe)",
+                         ctx.author.avatar_url, await
+                         fetch_webhook(ctx.channel))
+
     @commands.Cog.listener()
     async def on_message_edit(self, ctx, after):
 
         snipe_target = db["snipe_target"]
         if ctx.author.id in snipe_target:
             send = f"> {after.content}\n **Before:** `{ctx.content}`"
-            send_webhook(send, f"{ctx.author.name} (editsnipe)", ctx.author.avatar_url, await fetch_webhook(ctx.channel))
+            send_webhook(send, f"{ctx.author.name} (editsnipe)",
+                         ctx.author.avatar_url, await
+                         fetch_webhook(ctx.channel))
 
     # Commands
 
@@ -36,10 +39,10 @@ class Fun(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def frame(self, ctx, user: discord.Member, *, content):
 
-      if is_owner(ctx.author.id) or (user.id not in safe):
-        frame(content, user, await fetch_webhook(ctx.channel))
-      else:
-        frame(content, ctx.author, await fetch_webhook(ctx.channel))
+        if is_owner(ctx.author.id) or (user.id not in safe):
+            frame(content, user, await fetch_webhook(ctx.channel))
+        else:
+            frame(content, ctx.author, await fetch_webhook(ctx.channel))
 
     """
     @commands.command(aliases=['name'])
@@ -51,9 +54,6 @@ class Fun(commands.Cog):
         if not staff_check(ctx.author, ctx.guild):
           raise errors.NotStaff(ctx.author)
     """
-
-
-      
 
 
 def setup(client):

@@ -14,17 +14,15 @@ import contextlib
 import textwrap
 
 
-
 class Owner(commands.Cog):
-
     def __init__(self, client):
         self.client = client
-    
+
     def cog_check(self, ctx):
-      if is_owner(ctx.author):
-        return True
-      else:
-        raise commands.NotOwner()
+        if is_owner(ctx.author):
+            return True
+        else:
+            raise commands.NotOwner()
 
     # Commands
 
@@ -42,7 +40,9 @@ class Owner(commands.Cog):
             banned.append(user.id)
             db["banned"] = banned
 
-            await ctx.send(embed=discord.Embed(description=f"haha **`{user}`**, you are now botbanned", color=cyan))
+            await ctx.send(embed=discord.Embed(
+                description=f"haha **`{user}`**, you are now botbanned",
+                color=cyan))
         else:
             await ctx.send("user already banned wheeeeeeee")
 
@@ -55,7 +55,8 @@ class Owner(commands.Cog):
             banned.remove(user.id)
             db["banned"] = banned
 
-            await ctx.send(embed=discord.Embed(description=f"sadly, **`{user}`** was unbanned", color=cyan))
+            await ctx.send(embed=discord.Embed(
+                description=f"sadly, **`{user}`** was unbanned", color=cyan))
         else:
             await ctx.send("user isnt banned :(")
 
@@ -84,7 +85,9 @@ class Owner(commands.Cog):
         if user.id not in snipe_target:
             snipe_target.append(user.id)
             db["snipe_target"] = snipe_target
-            await ctx.send(embed=discord.Embed(description=f"**`{user}`** has been tagged. Have fun 💀", color=cyan))
+            await ctx.send(embed=discord.Embed(
+                description=f"**`{user}`** has been tagged. Have fun 💀",
+                color=cyan))
         else:
             await ctx.send(f"**`{user}`** has already been tagged.")
 
@@ -94,7 +97,9 @@ class Owner(commands.Cog):
         if user.id in snipe_target:
             snipe_target.remove(user.id)
             db["snipe_target"] = snipe_target
-            await ctx.send(embed=discord.Embed(description=f"**`{user}`** has been untagged. sad.", color=cyan))
+            await ctx.send(embed=discord.Embed(
+                description=f"**`{user}`** has been untagged. sad.",
+                color=cyan))
         else:
             await ctx.send(f"**`{user}`** hasn't been tagged... yet")
 
@@ -114,7 +119,7 @@ class Owner(commands.Cog):
             "message": ctx.message,
             "utils": utils,
             "game_info": game_info,
-            "db":  db
+            "db": db
         }
 
         stdout = io.StringIO()
@@ -122,39 +127,41 @@ class Owner(commands.Cog):
         try:
             with contextlib.redirect_stdout(stdout):
                 exec(
-                    f"async def func():\n{textwrap.indent(code, '    ')}", local_variables,
+                    f"async def func():\n{textwrap.indent(code, '    ')}",
+                    local_variables,
                 )
 
                 returned = await local_variables["func"]()
                 console = stdout.getvalue()
                 if returned is None and console != "":
-                  result = f"{console}"
+                    result = f"{console}"
                 elif console == "" and returned is None:
-                  ded = False
+                    ded = False
                 else:
-                  result = f"{console}\n-- {returned}\n"
+                    result = f"{console}\n-- {returned}\n"
         except Exception as e:
             result = "".join(format_exception(e, e, e.__traceback__))
 
         if ded:
 
-            pager = Pag(
-              timeout=100,
-              entries=[result[i: i + 2000] for i in range(0, len(result), 2000)],
-              length=1,
-              prefix="```py\n",
-              suffix="```"
-            )
+            pager = Pag(timeout=100,
+                        entries=[
+                            result[i:i + 2000]
+                            for i in range(0, len(result), 2000)
+                        ],
+                        length=1,
+                        prefix="```py\n",
+                        suffix="```")
 
             await pager.start(ctx)
-    
+
     @commands.command()
     async def sudo(self, ctx, user: discord.Member, *, msg):
-    
-      fake = copy(ctx.message)
-      fake.author = user
-      fake.content = ctx.prefix + msg
-      await self.client.process_commands(fake)
+
+        fake = copy(ctx.message)
+        fake.author = user
+        fake.content = ctx.prefix + msg
+        await self.client.process_commands(fake)
 
     # _HELP EDIT COMMANDS_
 
@@ -163,90 +170,103 @@ class Owner(commands.Cog):
     @commands.command(aliases=['ach'])
     async def addcoghelp(self, ctx, cogname, cogdesc):
 
-      db['help'][cogname]= {"desc": cogdesc, "cmds": {}}
+        db['help'][cogname] = {"desc": cogdesc, "cmds": {}}
 
-      embed = discord.Embed(title= f"{cogname} Field", description= f"> {cogdesc}", color=cyan)
-      embed.set_footer(text="lol imagine asking for help")
-
-      await ctx.reply("Cog successfully added, it'll look like this", embed=embed)
-
-    
-    @commands.command(aliases=['ech'])
-    async def editcoghelp(self, ctx, cogname, cogdesc):
-      if cogname in db['help'].keys():
-
-        db['help'][cogname]['desc'] = cogdesc
-
-        embed = discord.Embed(title= f"{cogname} Field", description= f"> {cogdesc}", color=cyan)
+        embed = discord.Embed(title=f"{cogname} Field",
+                              description=f"> {cogdesc}",
+                              color=cyan)
         embed.set_footer(text="lol imagine asking for help")
 
-        await ctx.reply("Cog successfully edited, it'll look like this", embed=embed)
+        await ctx.reply("Cog successfully added, it'll look like this",
+                        embed=embed)
 
-      else:
-        await ctx.send("cog not found")
-    
+    @commands.command(aliases=['ech'])
+    async def editcoghelp(self, ctx, cogname, cogdesc):
+        if cogname in db['help'].keys():
+
+            db['help'][cogname]['desc'] = cogdesc
+
+            embed = discord.Embed(title=f"{cogname} Field",
+                                  description=f"> {cogdesc}",
+                                  color=cyan)
+            embed.set_footer(text="lol imagine asking for help")
+
+            await ctx.reply("Cog successfully edited, it'll look like this",
+                            embed=embed)
+
+        else:
+            await ctx.send("cog not found")
+
     @commands.command(aliases=['dcgh'])
     async def deletecoghelp(self, ctx, cogname):
 
-      if cogname in db['help'].keys():
-        await ctx.send(f"Help entry for Cog `{cogname}` has been deleted.")
-        del db['help'][cogname]
-      else:
-        await ctx.send("cog not found")
+        if cogname in db['help'].keys():
+            await ctx.send(f"Help entry for Cog `{cogname}` has been deleted.")
+            del db['help'][cogname]
+        else:
+            await ctx.send("cog not found")
 
     @commands.command(aliases=['pc'])
     async def privatecog(self, ctx, cogname):
-      if cogname in db['help'].keys():
-        db['help'][cogname]['guild'] = ctx.guild.id
+        if cogname in db['help'].keys():
+            db['help'][cogname]['guild'] = ctx.guild.id
 
-        await ctx.send(f"The cog `{cogname}` will now only be visible in this server")
-      else:
-        await ctx.send("cog not found")
+            await ctx.send(
+                f"The cog `{cogname}` will now only be visible in this server")
+        else:
+            await ctx.send("cog not found")
 
     # Command Help Commands
 
     @commands.command(aliases=['acdh'])
     async def addcmdhelp(self, ctx, cogname, cmdname, cmddesc):
 
-      if cogname in db['help'].keys():
-        db['help'][cogname]['cmds'][cmdname] = cmddesc
+        if cogname in db['help'].keys():
+            db['help'][cogname]['cmds'][cmdname] = cmddesc
 
-        embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
-        embed.set_footer(text="lol imagine asking for help")
+            embed = discord.Embed(title=f"{cmdname} Command",
+                                  description=f"> {cmddesc}",
+                                  color=cyan)
+            embed.set_footer(text="lol imagine asking for help")
 
-        await ctx.reply("Command successfully added, it'll look like this", embed=embed)
-      else:
-        await ctx.send("cog not found")
-    
+            await ctx.reply("Command successfully added, it'll look like this",
+                            embed=embed)
+        else:
+            await ctx.send("cog not found")
+
     @commands.command(aliases=['ecdh'])
     async def editcmdhelp(self, ctx, cogname, cmdname, cmddesc):
 
-      if cogname in db['help'].keys():
-        if cmdname in db['help'][cogname]['cmds'].keys():
-          db['help'][cogname]['cmds'][cmdname] = cmddesc
+        if cogname in db['help'].keys():
+            if cmdname in db['help'][cogname]['cmds'].keys():
+                db['help'][cogname]['cmds'][cmdname] = cmddesc
 
-          embed = discord.Embed(title= f"{cmdname} Command", description= f"> {cmddesc}", color=cyan)
-          embed.set_footer(text="lol imagine asking for help")
+                embed = discord.Embed(title=f"{cmdname} Command",
+                                      description=f"> {cmddesc}",
+                                      color=cyan)
+                embed.set_footer(text="lol imagine asking for help")
 
-          await ctx.reply("Command successfully edited, it'll look like this", embed=embed)
+                await ctx.reply(
+                    "Command successfully edited, it'll look like this",
+                    embed=embed)
+            else:
+                await ctx.send("command not found")
         else:
-          await ctx.send("command not found")
-      else:
-        await ctx.send("cog not found")
-    
+            await ctx.send("cog not found")
+
     @commands.command(aliases=['dcdh'])
     async def deletecmdhelp(self, ctx, cogname, cmdname):
 
-      if cogname in db['help'].keys():
-        if cmdname in db['help'][cogname]['cmds'].keys():
-          await ctx.send(f"Help entry for command `{cmdname}` has been deleted.")
-          del db['help'][cmdname]
+        if cogname in db['help'].keys():
+            if cmdname in db['help'][cogname]['cmds'].keys():
+                await ctx.send(
+                    f"Help entry for command `{cmdname}` has been deleted.")
+                del db['help'][cmdname]
+            else:
+                await ctx.send("command not found")
         else:
-          await ctx.send("command not found")
-      else:
-        await ctx.send("cog not found")
-    
-    
+            await ctx.send("cog not found")
+
 
 def setup(client):
     client.add_cog(Owner(client))
