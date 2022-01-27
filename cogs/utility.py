@@ -17,7 +17,7 @@ class Utility(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         try:
-            if not ctx.author.bot and disabled_check(ctx.guild.id, "afk"):
+            if not ctx.author.bot and disabled_check(ctx.guild, "afk"):
                 afk = db['afk']
                 for user in ctx.mentions:
                     if str(ctx.guild.id) in afk['server'].keys() and str(
@@ -117,7 +117,6 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=['pingmsg', 'pingmessage'])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @is_not_banned()
     async def afk(self, ctx, *, message):
 
         desc = ""

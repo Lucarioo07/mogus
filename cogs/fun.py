@@ -35,7 +35,6 @@ class Fun(commands.Cog):
     # Commands
 
     @commands.command()
-    @is_not_banned()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def frame(self, ctx, user: discord.Member, *, content):
 

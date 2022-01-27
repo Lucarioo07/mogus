@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_components import *
-from game_stuff import *
+from game_stuff import moves, info
 from utils import *
 
 
@@ -23,19 +23,13 @@ class Game(commands.Cog):
             "Using a move that costs more reloads than you have results in `Overloading`, which kills you regardless of your super-saiyan level. "
             "The price of each attack is put next to the button. "
             "Green buttons are power up moves, red buttons are attacks, and blue buttons are defensive. "
-            "Each of the defensive moves have pros and cons, which will be listed below, read <:gru_gun:786829006476410910>. "
+            "Each of the defensive moves have pros and cons, which will be listed below, read or else <:gru_gun:786829006476410910>. "
             "Hope you enjoy!",
             color=cyan)
-        embed.add_field(name=info["reload_title"], value=info["reload_desc"])
-        embed.add_field(name=info["kame_title"], value=info["kame_desc"])
-        embed.add_field(name=info["double_title"], value=info["double_desc"])
-        embed.add_field(name=info["slash_title"], value=info["slash_desc"])
-        embed.add_field(name=info["spirit_title"], value=info['spirit_desc'])
-        embed.add_field(name=info['fist_title'], value=info['fist_desc'])
-        embed.add_field(name=info['reflect_title'], value=info['reflect_desc'])
-        embed.add_field(name=info['block_title'], value=info['block_desc'])
-        embed.add_field(name=info['tp_title'], value=info['tp_desc'])
-        embed.add_field(name=info['saiyan_title'], value=info['saiyan_desc'])
+
+        movelist = ['reload', 'kame', 'double', 'slash', 'spirit', 'fist', 'reflect', 'block', 'tp', 'saiyan']
+        for move in movelist:
+            embed.add_field(name=info[f"{move}_title"], value=info[f"{move}_desc"])
 
         await ctx.send(embed=embed)
 

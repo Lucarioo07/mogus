@@ -132,16 +132,6 @@ def in_guild(guild_id):
     return commands.check(predicate)
 
 
-def is_not_banned():
-    async def predicate(ctx):
-        if ban_check(ctx.author):
-            return True
-        else:
-            raise errors.UserBanned()
-
-    return commands.check(predicate)
-
-
 def is_staff():
     async def predicate(ctx):
         if staff_check(ctx.author, ctx.guild):
@@ -161,12 +151,16 @@ def is_owner(user):
     else:
         return user == 622090741862236200
 
-
+def is_not_banned(user):
+        if isinstance(user, discord.User) or isinstance(user, discord.Member):
+            return user.id not in db['banned']
+        else:
+            return user not in db['banned']
 def ban_check(user):
-    if isinstance(user, discord.User) or isinstance(user, discord.Member):
-        return user.id not in db['banned']
+    if is_not_banned(user):
+        return True
     else:
-        return user not in db['banned']
+        raise errors.UserBanned()
 
 
 def staff_check(user: discord.Member, guild: discord.Guild):
@@ -188,8 +182,8 @@ def disabled_check(guild: discord.Guild, cmd):
         return True
 
 
-def locked_check():
-    if db['locked']:
+def locked_check(user: discord.User):
+    if db['lock'] and not is_owner(user):
         raise errors.BotLocked()
     else:
         return True

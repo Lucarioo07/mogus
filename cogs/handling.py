@@ -102,7 +102,17 @@ class Handling(commands.Cog):
                     color=cyan
                 )
                 embed.set_footer(text="imagine disabling it in the first place")
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, delete_after=15)
+            
+            elif isinstance(error, errors.BotLocked):
+                embed = discord.Embed(
+                    title="Bot is Locked",
+                    description=
+                    "The bot is currently locked for whatsoever reason, please bear with it until resolved ||zank you||",
+                    color=cyan
+                )
+                embed.set_footer(text="locking bot is kinda cring")
+                await ctx.send(embed=embed, delete_after=15)
 
             else:
                 embed = discord.Embed(
