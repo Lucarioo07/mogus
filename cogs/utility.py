@@ -121,7 +121,7 @@ class Utility(commands.Cog):
 
         desc = ""
         if message.count("\n") > 2:
-            message = message[:message.rfind("\n")]
+            message = message.replace("\r", " ").replace("\n", " ")
 
         if message.startswith("global"):
             m = message[6:]
@@ -161,7 +161,7 @@ class Utility(commands.Cog):
     async def todo(self, ctx, todo=None):
 
         if not todo:
-            if ctx.author.id in db['todo'].tags():
+            if ctx.author.id in db['todo'].keys():
                 todo = "```prolog\n"
                 i = 0
                 empty = True

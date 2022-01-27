@@ -33,7 +33,7 @@ async def on_guild_join(guild):
 async def global_checks(ctx):
     print(
         f"{ctx.author} used command {ctx.command} with args {' '.join(ctx.args)} at "
-        f"{ctx.created_at.astimezone(dxb_tz).strftime('%m/%d/%Y, %H:%M:%S')}"
+        f"{ctx.message.created_at.astimezone(dxb_tz).strftime('%m/%d/%Y, %H:%M:%S')}"
     )
     if disabled_check(ctx.guild, ctx.command.name):
         if locked_check(ctx.author):
