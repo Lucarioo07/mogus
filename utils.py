@@ -44,6 +44,7 @@ colors = {
 }
 cyan = 65486
 
+log = 936979333891903518
 
 async def fetch_webhook(channel: discord.TextChannel):
     global webhook
