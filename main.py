@@ -7,6 +7,7 @@ import os
 from replit import db
 import errors
 
+
 client.remove_command("help")
 
 
@@ -32,10 +33,13 @@ async def on_guild_join(guild):
 @client.check
 async def global_checks(ctx):
     logchannel = await client.fetch_channel(log)
-    await logchannel.send(
-        f"`{ctx.author}` used command `{ctx.command}` with args `{ctx.message.content[len(ctx.command.name)+1:]} ` at "
-        f"`{ctx.message.created_at.astimezone(dxb_tz).strftime('%m/%d/%Y, %H:%M:%S')}`"
+    embed = discord.Embed(
+        description=
+        f"`{ctx.author}` used command `{ctx.command}` with args `{ctx.message.content[len(ctx.command.name)+1:]} `",
+        timestamp=ctx.message.created_at,
+        color=cyan
     )
+    await logchannel.send(embed=embed)
     if disabled_check(ctx.guild, ctx.command.name):
         if locked_check(ctx.author):
             if ban_check(ctx.author):

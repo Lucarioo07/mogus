@@ -207,7 +207,7 @@ class Mod(commands.Cog):
             )
             await ctx.reply(embed=embed)
 
-    @commands.command(aliases=["dc"])
+    @commands.command(aliases=["dc", "disable"])
     async def disablecommand(self, ctx, command):
         if command == "enablecommand":
             await ctx.reply("nice try, but you can't disable enablecommand 🤡")
@@ -228,7 +228,7 @@ class Mod(commands.Cog):
                 color=cyan)
             await ctx.send(embed=embed)
     
-    @commands.command(aliases=["ec"])
+    @commands.command(aliases=["ec", "enable"])
     async def enablecommand(self, ctx, command):
 
         if str(ctx.guild.id) not in db['disabled'].keys():

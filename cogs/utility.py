@@ -16,42 +16,42 @@ class Utility(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
-        try:
-            if not ctx.author.bot and disabled_check(ctx.guild, "afk"):
-                afk = db['afk']
-                for user in ctx.mentions:
-                    if str(ctx.guild.id) in afk['server'].keys() and str(
-                            user.id) in afk['server'][str(ctx.guild.id)]:
-                        embed = discord.Embed(
-                            description=
-                            f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*",
-                            color=cyan)
-                        embed.set_footer(
-                            text=
-                            f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
-                        )
-                        await ctx.reply(embed=embed, delete_after=15)
+        
+        if not ctx.author.bot and not (
+                str(ctx.guild.id) in db['disabled'] and
+                "afk" in [i for i in db['disabled'][str(ctx.guild.id)]]):
+            afk = db['afk']
+            for user in ctx.mentions:
+                if str(ctx.guild.id) in afk['server'].keys() and str(
+                        user.id) in afk['server'][str(ctx.guild.id)]:
+                    embed = discord.Embed(
+                        description=
+                        f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*",
+                        color=cyan)
+                    embed.set_footer(
+                        text=
+                        f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
+                    )
+                    await ctx.reply(embed=embed, delete_after=15)
 
-                    elif str(user.id) in afk['global'].keys():
-                        embed = discord.Embed(
-                            description=
-                            f"***{user}:** `{afk['global'][str(user.id)]}`*",
-                            color=cyan)
-                        embed.set_footer(
-                            text=
-                            f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
-                        )
-                        await ctx.reply(embed=embed, delete_after=15)
+                elif str(user.id) in afk['global'].keys():
+                    embed = discord.Embed(
+                        description=
+                        f"***{user}:** `{afk['global'][str(user.id)]}`*",
+                        color=cyan)
+                    embed.set_footer(
+                        text=
+                        f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
+                    )
+                    await ctx.reply(embed=embed, delete_after=15)
 
-                    if user == client.user:
-                        embed = discord.Embed(
-                            description=
-                            f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
-                            color=cyan)
-                        await ctx.reply(embed=embed, delete_after=15)
+                if user == client.user:
+                    embed = discord.Embed(
+                        description=
+                        f"The prefix of this server is `{db['prefix'][str(ctx.guild.id)]}`",
+                        color=cyan)
+                    await ctx.reply(embed=embed, delete_after=15)
 
-        except errors.CommandDisabled():
-            pass
 
     # Commands
 

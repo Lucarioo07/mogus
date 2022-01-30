@@ -17,6 +17,19 @@ class Handling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        
+        logchannel = await client.fetch_channel(log)
+        result = "".join(format_exception(error, error, error.__traceback__))
+        embed = discord.Embed(description=
+                                f'__**Information**__\n'
+                                f'> **Guild:** `{ctx.guild}` `{ctx.guild.id}`\n'
+                                f'> **User:** `{ctx.author}` `{ctx.author.id}`\n'
+                                f'> **Message:** `{ctx.message.content}`\n'
+                                f"```py\n{result}```",
+                                timestamp=ctx.message.created_at,
+                                color=cyan)
+        check = lambda x: x.mention if is_owner(x) else ""
+        await logchannel.send(check(ctx.author), embed=embed)
 
         if isinstance(error, commands.CommandOnCooldown):
             embed = discord.Embed(
@@ -140,14 +153,7 @@ class Handling(commands.Cog):
             await ctx.send(embed=embed, delete_after=7.5)
 
         else:
-            if is_owner(ctx.author):
-                result = "".join(
-                    format_exception(error, error, error.__traceback__))
-                embed = discord.Embed(description=f"```py\n{result}```",
-                                      color=cyan)
-                await ctx.reply(embed=embed, delete_after=30)
-            else:
-                raise error
+            raise error
 
 
 def setup(client):

@@ -22,17 +22,17 @@ class Grade(commands.Cog):
 
         now = datetime.datetime.now(dxb_tz)
         timestr = now.strftime("%d %B %Y")
-        try:
-            db["warns"][str(ctx.guild.id)][str(warned.id)][str(
-                ctx.message.id)] = {
-                    "staff": ctx.author.id,
-                    "reason": reason,
-                    "channel": ctx.channel.id,
-                    "time": timestr
-                }
+        if str(ctx.guild.id) in db['warns']:
+            if str(warned.id) in db['warns'][str(ctx.guild.id)]:
+                db["warns"][str(ctx.guild.id)][str(warned.id)][str(
+                    ctx.message.id)] = {
+                        "staff": ctx.author.id,
+                        "reason": reason,
+                        "channel": ctx.channel.id,
+                        "time": timestr
+                    }
 
-        except:
-            try:
+            else:
                 db["warns"][str(ctx.guild.id)][str(warned.id)] = {
                     str(ctx.message.id): {
                         "staff": ctx.author.id,
@@ -41,17 +41,17 @@ class Grade(commands.Cog):
                         "time": timestr
                     }
                 }
-            except:
-                db["warns"][str(ctx.guild.id)] = {
-                    str(warned.id): {
-                        str(ctx.message.id): {
-                            "staff": ctx.author.id,
-                            "reason": reason,
-                            "channel": ctx.channel.id,
-                            "time": timestr
-                        }
+        else:
+            db["warns"][str(ctx.guild.id)] = {
+                str(warned.id): {
+                    str(ctx.message.id): {
+                        "staff": ctx.author.id,
+                        "reason": reason,
+                        "channel": ctx.channel.id,
+                        "time": timestr
                     }
                 }
+            }
 
         embed = discord.Embed(
             description=
