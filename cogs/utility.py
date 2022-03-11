@@ -11,39 +11,40 @@ import errors
 class Utility(commands.Cog):
     def __init__(self, client):
         self.client = client
-
+        
+    cog_help(name="Utility", desc="Commands that try to be useful but fail miserably")    
+    
     # Events
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
         
-        if not ctx.author.bot and not (
-                str(ctx.guild.id) in db['disabled'] and
-                "afk" in [i for i in db['disabled'][str(ctx.guild.id)]]):
+        if not ctx.author.bot:
             afk = db['afk']
             for user in ctx.mentions:
-                if str(ctx.guild.id) in afk['server'].keys() and str(
-                        user.id) in afk['server'][str(ctx.guild.id)]:
-                    embed = discord.Embed(
-                        description=
-                        f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*",
-                        color=cyan)
-                    embed.set_footer(
-                        text=
-                        f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
-                    )
-                    await ctx.reply(embed=embed, delete_after=15)
+                if not (str(ctx.guild.id) in db['disabled'] and "afk" in db['disabled'][str(ctx.guild.id)]):
+                    if str(ctx.guild.id) in afk['server'].keys() and str(
+                            user.id) in afk['server'][str(ctx.guild.id)]:
+                        embed = discord.Embed(
+                            description=
+                            f"***{user}:** `{afk['server'][str(ctx.guild.id)][str(user.id)]}`*",
+                            color=cyan)
+                        embed.set_footer(
+                            text=
+                            f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
+                        )
+                        await ctx.reply(embed=embed, delete_after=15)
 
-                elif str(user.id) in afk['global'].keys():
-                    embed = discord.Embed(
-                        description=
-                        f"***{user}:** `{afk['global'][str(user.id)]}`*",
-                        color=cyan)
-                    embed.set_footer(
-                        text=
-                        f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
-                    )
-                    await ctx.reply(embed=embed, delete_after=15)
+                    elif str(user.id) in afk['global'].keys():
+                        embed = discord.Embed(
+                            description=
+                            f"***{user}:** `{afk['global'][str(user.id)]}`*",
+                            color=cyan)
+                        embed.set_footer(
+                            text=
+                            f"use {db['prefix'][str(ctx.guild.id)]}afk to get your own ping message"
+                        )
+                        await ctx.reply(embed=embed, delete_after=15)
 
                 if user == client.user:
                     embed = discord.Embed(
@@ -57,19 +58,24 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["halp"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def help(self, ctx, field=None):
+    @command_help(name="Help", 
+              desc="Displays this message 🤡. You can ask for help for a whole field, or just a single command. Leaving it blank will display all the                                                fields available in the server", 
+              syntax="help [command or field]",
+              cog="Utility",
+              aliases=["halp"])
+    async def help(self, ctx, *, field=None):
 
         cmds = db['help']
+        if field: field = field.title()
         if not field:
-
             embed = discord.Embed(
                 title="__Help List__",
                 description=
                 "In the arguments of a command, a `<>` around one means a compulsory argument meanwhile a `[]` around one means an optional argument",
                 color=cyan)
             for cogname in cmds.keys():
-                if 'guild' in db['help'][cogname].keys():
-                    if ctx.guild.id == db['help'][cogname]['guild']:
+                if cmds[cogname]['guild']:
+                    if ctx.guild.id == cmds[cogname]['guild']:
                         embed.add_field(name=f"{cogname} Field",
                                         value=f"> {cmds[cogname]['desc']}",
                                         inline=True)
@@ -77,33 +83,35 @@ class Utility(commands.Cog):
                     embed.add_field(name=f"{cogname} Field",
                                     value=f"> {cmds[cogname]['desc']}",
                                     inline=True)
-            embed.set_footer(text="Specify a field to get command info")
+            embed.set_footer(text="Specify a field to get info on commands")
 
         else:
-            if field.capitalize() in cmds.keys():
-                if 'guild' not in cmds[field.capitalize()].keys() or (
-                        'guild' in cmds[field.capitalize()].keys()
-                        and cmds[field.capitalize()]['guild'] == ctx.guild.id):
+            if field in cmds.keys():
+                if not cmds[field]['guild'] or cmds[field]['guild'] == ctx.guild.id:
                     embed = discord.Embed(
-                        title=f"__{field.capitalize()} Field__", color=cyan)
-                    embed.set_footer(
-                        text=
-                        "Specify a command to get info on only that command")
+                        title=f"__{field} Field__", color=cyan)
 
-                    for cmd in cmds[field.capitalize()]['cmds'].keys():
+                    for c in cmds[field]['commands'].keys():
+                        cmd = cmds[field]['commands'][c]
                         embed.add_field(
-                            name=f"{cmd} Command",
-                            value=f"> {cmds[field.capitalize()]['cmds'][cmd]}")
+                            name=f"{c} Command",
+                            value=f"> {cmd['desc']} \n"
+                                  f"__Syntax:__ `{gprefix(ctx.guild.id)}{cmd['syntax']}`")
+                    embed.set_footer(text=f"Use help with a command as an argument to get more detailed information on it")
             else:
                 for cog in cmds.keys():
-                    if 'guild' not in cmds[cog].keys() or (
-                            'guild' in cmds[cog].keys()
-                            and cmds[cog]['guild'] == ctx.guild.id):
-                        if (field.capitalize() in cmds[cog]['cmds'].keys()):
+                    if not cmds[cog]['guild'] or cmds[cog]['guild'] == ctx.guild.id:
+                        if (field in cmds[cog]['commands'].keys()):
+
+                            cmd = cmds[cog]['commands'][field]
+                            a = lambda: f"__Aliases:__ `{', '.join(cmd['aliases'])}` \n" if cmd['aliases'] else "" 
+                            
                             embed = discord.Embed(
-                                title=f"__{field.capitalize()} Command__",
+                                title=f"__{field} Command__",
                                 description=
-                                f"> {cmds[cog]['cmds'][field.capitalize()]}",
+                                f"> {cmd['desc']} \n"
+                                f"{a()}"
+                                f"__Syntax:__ `{gprefix(ctx.guild.id)}{cmd['syntax']}`",
                                 color=cyan)
                             embed.set_footer(
                                 text="lol imagine asking for help")
@@ -115,8 +123,15 @@ class Utility(commands.Cog):
                 description="Sorry but this field or command couldn't be found",
                 color=cyan))
 
+    
+
     @commands.command(aliases=['pingmsg', 'pingmessage'])
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @command_help(name="AFK", 
+              desc="Displays a message to be sent when you get pinged. If you specify 'global' before the message, then this will be shown in all                         servers with me in it. Not specifying it will make it only be seen in this server", 
+              syntax="afk ['global'] <message>",
+              cog="Utility",
+              aliases=["pingmsg" "pingmessage"])
     async def afk(self, ctx, *, message):
 
         desc = ""
@@ -124,7 +139,7 @@ class Utility(commands.Cog):
             message = message.replace("\r", " ").replace("\n", " ")
 
         if message.startswith("global"):
-            m = message[6:]
+            m = message[7:]
             if m == "remove":
                 try:
                     del db['afk']['global'][str(ctx.author.id)]
@@ -155,68 +170,15 @@ class Utility(commands.Cog):
 
         embed = discord.Embed(description=desc, color=cyan)
         await ctx.send(embed=embed)
-
+    
     @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def todo(self, ctx, todo=None):
-
-        if not todo:
-            if ctx.author.id in db['todo'].keys():
-                todo = "```prolog\n"
-                i = 0
-                empty = True
-                for to in db['todo'][str(ctx.author.id)]:
-                    todo += f"{i}. {db['todo'][str(ctx.author.id)][i]}\n"
-                    i += 1
-                    empty = False
-
-                todo += "```"
-                if empty:
-                    todo = "There aren't any entries in your to-do list f"
-
-        else:
-            if todo.startswith("add "):
-                t = todo[4:]
-
-                if t.len() > 50:
-                    todo = "Too large, keep it under 50 characters"
-                else:
-                    try:
-                        tod = db['todo'][str(ctx.author.id)]
-                        tod.append(t)
-                        db['todo'][str(ctx.author.id)] = tod
-                    except:
-                        db['todo'][str(ctx.author.id)] = [t]
-                    todo = f"Added entry `{t}` to your list"
-
-            elif todo.startswith("remove "):
-                t = todo[7:]
-
-                if t.len() > 50:
-                    todo = "Too large, keep it under 50 characters"
-                else:
-                    try:
-                        tod = db['todo'][str(ctx.author.id)]
-
-                        if t.isnumeric():
-                            if int(t) <= tod.len():
-                                del tod[int(t) + 1]
-                                todo = f"Deleted entry number {t} from the list"
-                            else:
-                                todo = f"an entry with this number doesn't exist"
-
-                        else:
-                            try:
-                                tod.remove(t)
-                                todo = f"Deleted entry {t} from the list"
-                            except:
-                                todo = f"This entry doesn't exist, make sure capitalization is correct or just use the index."
-
-                        db['todo'][str(ctx.author.id)] = tod
-                    except:
-                        todo = "You don't have any entries in your todo list 💀"
-
-        embed = discord.Embed(description=todo, color=cyan)
+    @command_help(name="ping", 
+                  desc="Show bot latency (or ping)", 
+                  syntax="ping",
+                  cog="Utility")
+    async def ping(ctx):
+        await ctx.send(
+            f'Ping of main instance is `{round(client.latency * 1000)}ms` 🏓')
 
 
 def setup(client):

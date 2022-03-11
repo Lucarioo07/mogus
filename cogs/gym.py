@@ -8,20 +8,27 @@ import time
 import errors
 
 
-class Mystics(commands.Cog):
+class MysticsGym(commands.Cog):
     def __init__(self, client):
         self.client = client
+        
 
     def cog_check(self, ctx):
         if ctx.guild.id == 927259600628088842:
             return True
         else:
             raise errors.WrongServer
-
+            
+    cog_help(name="Mystics Gym", desc="Private commands for the Mystics Gym server", guild=927259600628088842)
+    
     # Commands
 
     @is_staff()
     @commands.command()
+    @command_help(name="Log", 
+                  desc="A staff command to log the results of a match", 
+                  syntax="cban <user>",
+                  cog="Mystics Gym")
     async def log(self, ctx, win: discord.Member, lose: discord.Member):
 
         if str(win.id) not in db['points'].keys():
@@ -99,4 +106,4 @@ class Mystics(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(Mystics(client))
+    client.add_cog(MysticsGym(client))

@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from replit import db
-from random import choice
 import os
 from utils import *
 import errors
@@ -11,6 +10,9 @@ class Fun(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+        
+    cog_help(name="Fun", desc="Commands for fun!") 
+    
     # Events
 
     @commands.Cog.listener()
@@ -36,6 +38,10 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @command_help(name="Frame", 
+                  desc="Frames a user to make it look like they said something", 
+                  syntax="frame <user> <text>",
+                  cog="Fun")
     async def frame(self, ctx, user: discord.Member, *, content):
 
         if is_owner(ctx.author.id) or (user.id not in safe):

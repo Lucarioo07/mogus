@@ -168,37 +168,7 @@ class Owner(commands.Cog):
 
     # Cog Help Commands
 
-    @commands.command(aliases=['ach'])
-    async def addcoghelp(self, ctx, cogname, cogdesc):
-
-        db['help'][cogname] = {"desc": cogdesc, "cmds": {}}
-
-        embed = discord.Embed(title=f"{cogname} Field",
-                              description=f"> {cogdesc}",
-                              color=cyan)
-        embed.set_footer(text="lol imagine asking for help")
-
-        await ctx.reply("Cog successfully added, it'll look like this",
-                        embed=embed)
-
-    @commands.command(aliases=['ech'])
-    async def editcoghelp(self, ctx, cogname, cogdesc):
-        if cogname in db['help'].keys():
-
-            db['help'][cogname]['desc'] = cogdesc
-
-            embed = discord.Embed(title=f"{cogname} Field",
-                                  description=f"> {cogdesc}",
-                                  color=cyan)
-            embed.set_footer(text="lol imagine asking for help")
-
-            await ctx.reply("Cog successfully edited, it'll look like this",
-                            embed=embed)
-
-        else:
-            await ctx.send("cog not found")
-
-    @commands.command(aliases=['dcgh'])
+    @commands.command(aliases=['dcg', 'deletecog'])
     async def deletecoghelp(self, ctx, cogname):
 
         if cogname in db['help'].keys():
@@ -207,55 +177,9 @@ class Owner(commands.Cog):
         else:
             await ctx.send("cog not found")
 
-    @commands.command(aliases=['pc'])
-    async def privatecog(self, ctx, cogname):
-        if cogname in db['help'].keys():
-            db['help'][cogname]['guild'] = ctx.guild.id
-
-            await ctx.send(
-                f"The cog `{cogname}` will now only be visible in this server")
-        else:
-            await ctx.send("cog not found")
-
     # Command Help Commands
 
-    @commands.command(aliases=['acdh'])
-    async def addcmdhelp(self, ctx, cogname, cmdname, cmddesc):
-
-        if cogname in db['help'].keys():
-            db['help'][cogname]['cmds'][cmdname] = cmddesc
-
-            embed = discord.Embed(title=f"{cmdname} Command",
-                                  description=f"> {cmddesc}",
-                                  color=cyan)
-            embed.set_footer(text="lol imagine asking for help")
-
-            await ctx.reply("Command successfully added, it'll look like this",
-                            embed=embed)
-        else:
-            await ctx.send("cog not found")
-
-    @commands.command(aliases=['ecdh'])
-    async def editcmdhelp(self, ctx, cogname, cmdname, cmddesc):
-
-        if cogname in db['help'].keys():
-            if cmdname in db['help'][cogname]['cmds'].keys():
-                db['help'][cogname]['cmds'][cmdname] = cmddesc
-
-                embed = discord.Embed(title=f"{cmdname} Command",
-                                      description=f"> {cmddesc}",
-                                      color=cyan)
-                embed.set_footer(text="lol imagine asking for help")
-
-                await ctx.reply(
-                    "Command successfully edited, it'll look like this",
-                    embed=embed)
-            else:
-                await ctx.send("command not found")
-        else:
-            await ctx.send("cog not found")
-
-    @commands.command(aliases=['dcdh'])
+    @commands.command(aliases=['dcd', 'deletecmd'])
     async def deletecmdhelp(self, ctx, cogname, cmdname):
 
         if cogname in db['help'].keys():

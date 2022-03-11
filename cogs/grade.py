@@ -8,16 +8,29 @@ from utils import *
 class Grade(commands.Cog):
     def __init__(self, client):
         self.client = client
+        
 
     def cog_check(self, ctx):
         if ctx.guild.id == 764060384897925120:
             return True
         else:
             raise errors.WrongServer()
-
+            
+    cog_help(name="Grade", desc="Private commands for the grade server", guild=764060384897925120)
+    
     # Commands
     @commands.command()
     @is_staff()
+    @command_help(name="Warn", 
+                  desc="A staff command to warn users. The punishments are dealt based on the number of warns in the last 3 days. Staff are demoted                            for each warn they recieve above 2 in the past 3 days, and will also recieve regular punishments \n "
+                        "```prolog\n"
+                        "3 Warns: Mute for 30 Minutes \n"
+                        "5 Warns: Mute for 1 Hour \n"
+                        "7 Warns: Mute for 1 Day \n"
+                        "10 Warns: Temporary Ban for 3 Days \n"
+                        "```", 
+                  syntax="warn <user> <reason>",
+                  cog="Grade")
     async def warn(self, ctx, warned: discord.Member, *, reason):
 
         now = datetime.datetime.now(dxb_tz)
@@ -65,25 +78,25 @@ class Grade(commands.Cog):
 
         if warncount == 3:
             dtime = now + pun['30m']
-            db['punishments']['mute'][str(
+            db['punishments'][str(ctx.guild.id)]['mute'][str(
                 warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
             await warned.add_roles(muterole)
             footer = "User has also been muted for 30m for having 3 warns in the past 3 days. "
         elif warncount == 5:
             dtime = now + pun['1h']
-            db['punishments']['mute'][str(
+            db['punishments'][str(ctx.guild.id)]['mute'][str(
                 warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
             await warned.add_roles(muterole)
             footer = "User has also been muted for 1h for having 5 warns in the past 3 days. "
         elif warncount == 7:
             dtime = now + pun['1d']
-            db['punishments']['mute'][str(
+            db['punishments'][str(ctx.guild.id)]['mute'][str(
                 warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
             await warned.add_roles(muterole)
             footer = "User has also been muted for 1d having 7 warns in the past 3 days. "
         elif warncount == 10:
             dtime = now + pun['3d']
-            db['punishments']['tempban'][str(
+            db['punishments'][str(ctx.guild.id)]['tempban'][str(
                 warned.id)] = dtime.strftime("%d %B %Y, %H:%M")
             await ctx.guild.ban(warned)
             footer = "User has also been tempbanned for 3d for having 10 warns in the past 3 days. "
@@ -114,9 +127,14 @@ class Grade(commands.Cog):
         await ctx.send(embed=embed)
         await warned.send(embed=embed)
 
-    @commands.command()
+    @commands.command(aliases=["delwarn"])
     @is_staff()
-    async def delwarn(self, ctx, warn_id):
+    @command_help(name="DeleteWarn", 
+                  desc="A staff command to delete a specific warn using its warn ID (the message ID of the warn command which warned)", 
+                  syntax="delwarn <id>",
+                  cog="Grade",
+                  aliases=["delwarn"])
+    async def deletewarn(self, ctx, warn_id):
         try:
             found = False
             for user in db['warns'][str(ctx.guild.id)].keys():
@@ -143,6 +161,10 @@ class Grade(commands.Cog):
 
     @commands.command()
     @is_staff()
+    @command_help(name="EditWarn", 
+                  desc="A staff command to edit a warns reason using its warn ID", 
+                  syntax="editwarn <id> <reason>",
+                  cog="Grade")
     async def editwarn(self, ctx, warn_id, new):
         try:
             found = False
@@ -170,6 +192,10 @@ class Grade(commands.Cog):
 
     @commands.command()
     @is_staff()
+    @command_help(name="ClearWarn", 
+                  desc="A staff command to clear the warns from a user", 
+                  syntax="clearnwarn <user>",
+                  cog="Grade")
     async def clearwarn(self, ctx, user: discord.User):
         try:
             del db["warns"][str(ctx.guild.id)][str(user.id)]
@@ -184,6 +210,11 @@ class Grade(commands.Cog):
 
     @commands.command(aliases=["warnings", "oopsies"])
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @command_help(name="Warns", 
+                  desc="Display the warns of a particular user. Displays your own warnings if left blank", 
+                  syntax="warns [user]",
+                  cog="Grade",
+                  aliases=["warnings", "oopsies"])
     async def warns(self, ctx, user: discord.User = None):
 
         if user is None:
@@ -205,10 +236,11 @@ class Grade(commands.Cog):
             description = "**Context Menu:** \n"
             for value in warns.values():
                 warn_id = get_key(value, warns)
+                print(warn_id)
                 reason = value["reason"]
                 channel = await client.fetch_channel(value['channel'])
                 timestamp = value["time"]
-                msg = await channel.fetch_message(warn_id)
+                msg = await channel.fetch_message(int(warn_id))
 
                 embed.add_field(
                     name=f"ID: `{warn_id}` \n",

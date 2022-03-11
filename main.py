@@ -20,7 +20,7 @@ async def on_ready():
     for filename in os.listdir('./cogs'):
         if filename.endswith(".py"):
             client.load_extension(f"cogs.{filename[:-3]}")
-
+    
     print("Bot is ready.")
 
 
@@ -68,7 +68,7 @@ async def load(ctx, extension):
             except commands.ExtensionAlreadyLoaded:
                 ded = f"**Cog `{extension}` is already loaded**"
             else:
-                ded = f"**Cog `{extension}` successfully loaded`**"
+                ded = f"**Cog `{extension}` successfully loaded**"
 
     embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
@@ -129,12 +129,6 @@ async def reload(ctx, extension):
 
     embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
-
-
-@client.command()
-async def ping(ctx):
-    await ctx.send(
-        f'Ping of main instance is `{round(client.latency * 1000)}ms` 🏓')
 
 
 keep_alive()

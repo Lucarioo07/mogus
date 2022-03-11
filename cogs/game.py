@@ -8,9 +8,17 @@ from utils import *
 class Game(commands.Cog):
     def __init__(self, client):
         self.client = client
-
+        
+    cog_help(name="Game", 
+            desc="Commands related to the bots custom Dragon-Ball Z game. Use the info command to learn how to play. (Caution: not factually accurate)")
+    
     @commands.command(aliases=["dbzinfo", "info"])
     @commands.cooldown(1, 10, commands.BucketType.user)
+    @command_help(name="DBZ_info", 
+                  desc="Gives information on how to play the Dragon-Ball Z game", 
+                  syntax="info",
+                  cog="Game",
+                  aliases=["dbzinfo, info"])
     async def dbz_info(self, ctx):
 
         embed = discord.Embed(
@@ -35,6 +43,11 @@ class Game(commands.Cog):
 
     @commands.command(aliases=["fight", "dbz"])
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @command_help(name="Challenge", 
+                  desc="Challenge a user to a game of Dragon-Ball Z. You can set your starting super-saiyan level or reloads", 
+                  syntax="fight <opponent> [reloads] [saiyan]",
+                  cog="Game",
+                  aliases=["fight, dbz"])
     async def challenge(self,
                         ctx,
                         opponent: discord.Member,

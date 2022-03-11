@@ -13,10 +13,15 @@ bot_token = os.environ['bot_token']
 
 
 async def prefix(client, message):
-    return db['prefix'][str(message.guild.id)]
+    try:
+        return commands.when_mentioned_or(db['prefix'][str(message.guild.id)])(client, message)
+    except:
+        db['prefix'][str(message.guild.id)] = ">"
+        return commands.when_mentioned_or(">")(client, message)
 
+intents = discord.Intents.all()
 
-client = commands.Bot(command_prefix=prefix)
+client = commands.Bot(command_prefix=prefix, intents=intents)
 com = DiscordComponents(client)
 
 safe = [622090741862236200, 888373479655751700]
@@ -117,9 +122,11 @@ def get_key(val, my_dict):
         if val == value:
             return key
 
-    return "key doesn't exist"
 
+def gprefix(guild):
+    return db['prefix'][str(guild)]
 
+            
 # Command Checks
 
 
@@ -171,8 +178,7 @@ def staff_check(user: discord.Member, guild: discord.Guild):
         guild = client.get_guild(guild)
 
     for role in user.roles:
-        if role.id in db['staff'][str(
-                guild.id)] or role.permissions.administrator:
+        if role.permissions.administrator or (str(guild.id) in db['staff'].keys() and role.id in db['staff'][str(guild.id)]):
             return True
 
 
@@ -210,3 +216,20 @@ pun = {
 }
 
 dxb_tz = pytz.timezone("Asia/Dubai")
+
+
+# Help
+
+def cog_help(name,desc, guild=None):
+    db['help'][name] = {"name": name, "desc": desc, "commands": {}, "guild": guild}
+
+
+def command_help(name, desc, syntax, cog, aliases= None):
+    def inner(func):
+        
+        db['help'][cog]['commands'][name] = {"desc": desc, "syntax": syntax, "aliases": aliases}
+        
+        return func
+    return inner
+    
+
