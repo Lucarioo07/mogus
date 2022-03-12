@@ -37,8 +37,7 @@ class Grade(commands.Cog):
         timestr = now.strftime("%d %B %Y")
         if str(ctx.guild.id) in db['warns']:
             if str(warned.id) in db['warns'][str(ctx.guild.id)]:
-                db["warns"][str(ctx.guild.id)][str(warned.id)][str(
-                    ctx.message.id)] = {
+                db["warns"][str(ctx.guild.id)][str(warned.id)][str(ctx.message.id)] = {
                         "staff": ctx.author.id,
                         "reason": reason,
                         "channel": ctx.channel.id,

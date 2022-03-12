@@ -6,6 +6,7 @@ from keep_alive import keep_alive
 import os
 from replit import db
 import errors
+from copy import copy
 
 
 client.remove_command("help")
@@ -29,9 +30,17 @@ async def on_guild_join(guild):
     if str(guild.id) not in db['prefix'].keys():
         db['prefix'][str(guild.id)] = ">"
 
+    embed = discord.Embed(title="Thanks for inviting me!",
+                          description="My prefix is `>`, but if you want to change that then use the `prefix` command. "
+                                      "Use `help` to get more info on any field or command. To set staff roles, use the `sstaff` command",
+                          color=cyan
+                         )
+    channel = guild.system_channel or guild.text_channels[0]
+    await channel.send(embed=embed)
 
-@client.check
-async def global_checks(ctx):
+    
+@client.event
+async def on_command(ctx):
     logchannel = await client.fetch_channel(log)
     embed = discord.Embed(
         description=
@@ -40,6 +49,10 @@ async def global_checks(ctx):
         color=cyan
     )
     await logchannel.send(embed=embed)
+    
+@client.check
+async def global_checks(ctx):
+    
     if disabled_check(ctx.guild, ctx.command.name):
         if locked_check(ctx.author):
             if ban_check(ctx.author):

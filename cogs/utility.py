@@ -66,12 +66,11 @@ class Utility(commands.Cog):
     async def help(self, ctx, *, field=None):
 
         cmds = db['help']
-        if field: field = field.title()
         if not field:
             embed = discord.Embed(
                 title="__Help List__",
                 description=
-                "In the arguments of a command, a `<>` around one means a compulsory argument meanwhile a `[]` around one means an optional argument",
+                "In the arguments of a command, a `<>` around one means a compulsory argument and a `[]` around one means an optional argument",
                 color=cyan)
             for cogname in cmds.keys():
                 if cmds[cogname]['guild']:
@@ -86,6 +85,7 @@ class Utility(commands.Cog):
             embed.set_footer(text="Specify a field to get info on commands")
 
         else:
+            field = field.title()
             if field in cmds.keys():
                 if not cmds[field]['guild'] or cmds[field]['guild'] == ctx.guild.id:
                     embed = discord.Embed(

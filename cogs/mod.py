@@ -32,21 +32,32 @@ class Mod(commands.Cog):
         for g in db['punishments'].keys():
             guild = await client.fetch_guild(int(g))
             muterole = discord.utils.get(guild.roles, id=db['muterole'][g])
+            
+            if 'mute' in db['punishments'][g].keys():
+                for user, timestr in db['punishments'][g]['mute'].items():
+                    raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+                    wtime = raw_wtime.replace(tzinfo=dxb_tz)
+                    delta = wtime - now
+                    if delta.total_seconds() < 0:
+                        member = await guild.fetch_member(int(user))
+                        await member.remove_roles(muterole)
+                        del db['punishments'][g]['mute'][user]
 
-            for user, timestr in db['punishments'][g]['mute'].items():
-                raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
-                wtime = raw_wtime.replace(tzinfo=dxb_tz)
-                delta = wtime - now
-                if delta.total_seconds() < 0:
-                    member = await guild.fetch_member(int(user))
-                    await member.remove_roles(muterole)
-                    del db['punishments'][g]['mute'][user]
+            if 'tempban' in db['punishments'][g].keys():
+                for user, timestr in db['punishments'][g]['tempban'].items():
+                    raw_wtime = datetime.datetime.strptime(timestr, "%d %B %Y, %H:%M")
+                    wtime = raw_wtime.replace(tzinfo=dxb_tz)
+                    delta = wtime - now
+                    if delta.total_seconds() < 0:
+                        user = await client.fetch_user(int(user))
+                        await guild.unban(user)
+                        del db['punishments'][g]['tempban'][user]
 
     # Commands
 
     @commands.command(aliases=['shut'])
     @command_help(name="Mute", 
-                  desc="Mute a user for a specified amount of time. Mutes for 30 minutes if time is not mentioned. Your timestring should be in the                            format `1t`, where `1` can be any number and `t` can be 'm' for minutes, 'h' for hours or 'd' for days", 
+                  desc="Mute a user for a specified amount of time. Mutes for 30 minutes if time is not mentioned. Your timestring should be in the                            format `nt`, where `n` can be any number and `t` can be 'm' for minutes, 'h' for hours or 'd' for days", 
                   syntax="mute <user> <time>",
                   cog="Staff",
                   aliases=["shut"])
@@ -102,7 +113,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['unshut'])
-    @command_help(name="unmute", 
+    @command_help(name="Unmute", 
                   desc="Unmutes a user", 
                   syntax="unmute <user>",
                   cog="Staff",
@@ -135,7 +146,7 @@ class Mod(commands.Cog):
     @commands.command()
     @command_help(name="Muterole", 
                   desc="Sets the role given to a user when they're muted (this removes their speaking permissions in all channels)", 
-                  syntax=">muterole <role>",
+                  syntax="muterole <role>",
                   cog="Staff")
     async def muterole(self, ctx, muterole: discord.Role):
 
