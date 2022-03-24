@@ -42,7 +42,7 @@ class Owner(commands.Cog):
             db["banned"] = banned
 
             await ctx.send(embed=discord.Embed(
-                description=f"haha **`{user}`**, you are now botbanned",
+                description=f"haha **`{user}`**, you are ~~bangi~~ botbanned",
                 color=cyan))
         else:
             await ctx.send("user already banned wheeeeeeee")
@@ -80,29 +80,6 @@ class Owner(commands.Cog):
 
         await ctx.send(embed=discord.Embed(description=benlist, color=cyan))
 
-    @commands.command()
-    async def tag(self, ctx, user: discord.Member):
-        snipe_target = db["snipe_target"]
-        if user.id not in snipe_target:
-            snipe_target.append(user.id)
-            db["snipe_target"] = snipe_target
-            await ctx.send(embed=discord.Embed(
-                description=f"**`{user}`** has been tagged. Have fun 💀",
-                color=cyan))
-        else:
-            await ctx.send(f"**`{user}`** has already been tagged.")
-
-    @commands.command()
-    async def untag(self, ctx, user: discord.Member):
-        snipe_target = db["snipe_target"]
-        if user.id in snipe_target:
-            snipe_target.remove(user.id)
-            db["snipe_target"] = snipe_target
-            await ctx.send(embed=discord.Embed(
-                description=f"**`{user}`** has been untagged. sad.",
-                color=cyan))
-        else:
-            await ctx.send(f"**`{user}`** hasn't been tagged... yet")
 
     @commands.command(name="eval", aliases=["exec"])
     async def _eval(self, ctx, *, code):

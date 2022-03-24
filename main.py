@@ -1,54 +1,13 @@
 import discord
 from discord.ext import commands
-from discord_components import Button, ButtonStyle
-from utils import *
+from utils import client, bot_token, disabled_check, locked_check, ban_check, log, cyan
 from keep_alive import keep_alive
 import os
 from replit import db
-import errors
-from copy import copy
 
 
 client.remove_command("help")
 
-
-@client.event
-async def on_ready():
-
-    activity = discord.Game(name=">help")
-    await client.change_presence(activity=activity, status=discord.Status.dnd)
-
-    for filename in os.listdir('./cogs'):
-        if filename.endswith(".py"):
-            client.load_extension(f"cogs.{filename[:-3]}")
-    
-    print("Bot is ready.")
-
-
-@client.event
-async def on_guild_join(guild):
-    if str(guild.id) not in db['prefix'].keys():
-        db['prefix'][str(guild.id)] = ">"
-
-    embed = discord.Embed(title="Thanks for inviting me!",
-                          description="My prefix is `>`, but if you want to change that then use the `prefix` command. "
-                                      "Use `help` to get more info on any field or command. To set staff roles, use the `sstaff` command",
-                          color=cyan
-                         )
-    channel = guild.system_channel or guild.text_channels[0]
-    await channel.send(embed=embed)
-
-    
-@client.event
-async def on_command(ctx):
-    logchannel = await client.fetch_channel(log)
-    embed = discord.Embed(
-        description=
-        f"`{ctx.author}` used command `{ctx.command}` with args `{ctx.message.content[len(ctx.command.name)+1:]} `",
-        timestamp=ctx.message.created_at,
-        color=cyan
-    )
-    await logchannel.send(embed=embed)
     
 @client.check
 async def global_checks(ctx):
@@ -74,14 +33,14 @@ async def load(ctx, extension):
         ded = "**`All Cogs successfully loaded`**"
     else:
         if f"{extension}.py" not in os.listdir("./cogs"):
-            ded = "`Not a valid cog`"
+            ded = "**`Not a valid cog`**"
         else:
             try:
                 client.load_extension(f"cogs.{extension}")
             except commands.ExtensionAlreadyLoaded:
-                ded = f"**Cog `{extension}` is already loaded**"
+                ded = f"Cog **`{extension}`** is already loaded"
             else:
-                ded = f"**Cog `{extension}` successfully loaded**"
+                ded = f"Cog **`{extension}`** successfully loaded"
 
     embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
@@ -101,14 +60,14 @@ async def unload(ctx, extension):
         ded = "**`All Cogs successfully unloaded`**"
     else:
         if f"{extension}.py" not in os.listdir("./cogs"):
-            ded = "`Not a valid cog`"
+            ded = "**`Not a valid cog`**"
         else:
             try:
                 client.unload_extension(f'cogs.{extension}')
             except commands.ExtensionNotLoaded:
-                ded = f"**Cog `{extension}` is already unloaded**"
+                ded = f"Cog **`{extension}`** is already unloaded"
             else:
-                ded = f"**Cog `{extension}` successfully unloaded**"
+                ded = f"Cog **`{extension}`** successfully unloaded"
 
     embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)
@@ -130,15 +89,15 @@ async def reload(ctx, extension):
         ded = "**`All Cogs successfully reloaded`**"
     else:
         if f"{extension}.py" not in os.listdir("./cogs"):
-            ded = "`Not a valid cog`"
+            ded = "**`Not a valid cog`**"
         else:
             try:
                 client.unload_extension(f'cogs.{extension}')
                 client.load_extension(f"cogs.{extension}")
             except commands.ExtensionNotLoaded:
-                ded = f"**Cog `{extension}` is currently unloaded**"
+                ded = f"Cog **`{extension}`** is currently unloaded"
             else:
-                ded = f"**Cog `{extension}` successfully reloaded**"
+                ded = f"Cog **`{extension}`** successfully reloaded"
 
     embed = discord.Embed(description=ded, color=cyan)
     await ctx.send(embed=embed)

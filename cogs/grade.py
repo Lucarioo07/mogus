@@ -22,7 +22,8 @@ class Grade(commands.Cog):
     @commands.command()
     @is_staff()
     @command_help(name="Warn", 
-                  desc="A staff command to warn users. The punishments are dealt based on the number of warns in the last 3 days. Staff are demoted                            for each warn they recieve above 2 in the past 3 days, and will also recieve regular punishments \n "
+                  desc="A staff command to warn users. The punishments are dealt based on the number of warns in the last 3 days. "
+                       "Staff are demoted for each warn they recieve above 2 in the past 3 days, and will also recieve regular punishments \n "
                         "```prolog\n"
                         "3 Warns: Mute for 30 Minutes \n"
                         "5 Warns: Mute for 1 Hour \n"
@@ -216,8 +217,7 @@ class Grade(commands.Cog):
                   aliases=["warnings", "oopsies"])
     async def warns(self, ctx, user: discord.User = None):
 
-        if user is None:
-            user = ctx.author
+        user = user or ctx.author
 
         try:
             warns = db["warns"][str(ctx.guild.id)][str(user.id)]
@@ -235,12 +235,15 @@ class Grade(commands.Cog):
             description = "**Context Menu:** \n"
             for value in warns.values():
                 warn_id = get_key(value, warns)
-                print(warn_id)
                 reason = value["reason"]
                 channel = await client.fetch_channel(value['channel'])
                 timestamp = value["time"]
-                msg = await channel.fetch_message(int(warn_id))
-
+                try:
+                    msg = await channel.fetch_message(int(warn_id))
+                    messagefound = True
+                except:
+                    messagefound = False
+                    
                 embed.add_field(
                     name=f"ID: `{warn_id}` \n",
                     value=
@@ -249,9 +252,11 @@ class Grade(commands.Cog):
                     f"Reason: \n"
                     f"> **`{reason}`**")
                 if len(reason) <= 20:
-                    description += f'> [**{reason}**]({msg.jump_url} "Warn ID: {warn_id}") \n'
+                    if messagefound: description += f'> [**{reason}**]({msg.jump_url} "Warn ID: {warn_id}") \n'
+                    else: description += f'> **{reason}** \n'
                 else:
-                    description += f'> [**{reason[0:20]}...**]({msg.jump_url} "Warn ID: {warn_id}") \n'
+                    if messagefound: description += f'> [**{reason[0:20]}...**]({msg.jump_url} "Warn ID: {warn_id}") \n'
+                    else: description += f'> **{reason}** \n'
             embed.description = description
             await ctx.send(embed=embed)
 

@@ -57,7 +57,7 @@ class Mod(commands.Cog):
 
     @commands.command(aliases=['shut'])
     @command_help(name="Mute", 
-                  desc="Mute a user for a specified amount of time. Mutes for 30 minutes if time is not mentioned. Your timestring should be in the                            format `nt`, where `n` can be any number and `t` can be 'm' for minutes, 'h' for hours or 'd' for days", 
+                  desc="Mute a user for a specified amount of time. Mutes for 30 minutes if time is not mentioned. Your timestring should be in the format `nt`, where `n` can be any number and `t` can be 'm' for minutes, 'h' for hours or 'd' for days", 
                   syntax="mute <user> <time>",
                   cog="Staff",
                   aliases=["shut"])

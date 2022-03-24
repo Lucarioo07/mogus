@@ -2,29 +2,15 @@ import discord
 import requests
 from discord.ext import commands
 from discord.ext.buttons import Paginator
-from discord_components import DiscordComponents
 import datetime
 import pytz
 from replit import db
 import os
 import errors
+import pegasus
 
 bot_token = os.environ['bot_token']
 
-
-async def prefix(client, message):
-    try:
-        return commands.when_mentioned_or(db['prefix'][str(message.guild.id)])(client, message)
-    except:
-        db['prefix'][str(message.guild.id)] = ">"
-        return commands.when_mentioned_or(">")(client, message)
-
-intents = discord.Intents.all()
-
-client = commands.Bot(command_prefix=prefix, intents=intents)
-com = DiscordComponents(client)
-
-safe = [622090741862236200, 888373479655751700]
 
 colors = {
     "WHITE": 0xFFFFFF,
@@ -48,18 +34,18 @@ colors = {
     "DARK_NAVY": 0x2C3E50,
 }
 cyan = 65486
-
 log = 936979333891903518
+
+client = pegasus.client
 
 async def fetch_webhook(channel: discord.TextChannel):
     global webhook
     webhooks = await channel.webhooks()
-    is_made = False
+    
     for i in webhooks:
         if i.name == "amogus":
             webhook = i
-            is_made = True
-    if not is_made:
+    else:
         webhook = await channel.create_webhook(name="amogus")
     return webhook
 

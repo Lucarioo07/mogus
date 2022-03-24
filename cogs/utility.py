@@ -104,8 +104,7 @@ class Utility(commands.Cog):
                         if (field in cmds[cog]['commands'].keys()):
 
                             cmd = cmds[cog]['commands'][field]
-                            a = lambda: f"__Aliases:__ `{', '.join(cmd['aliases'])}` \n" if cmd['aliases'] else "" 
-                            
+                            a = lambda: f"__Aliases:__ `{', '.join(cmd['aliases'])}` \n" if cmd['aliases'] else ""
                             embed = discord.Embed(
                                 title=f"__{field} Command__",
                                 description=
@@ -128,7 +127,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=['pingmsg', 'pingmessage'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     @command_help(name="AFK", 
-              desc="Displays a message to be sent when you get pinged. If you specify 'global' before the message, then this will be shown in all                         servers with me in it. Not specifying it will make it only be seen in this server", 
+              desc="Displays a message to be sent when you get pinged. If you specify 'global' before the message, then this will be shown in all servers with me in it. Not specifying it will make it only be seen in this server", 
               syntax="afk ['global'] <message>",
               cog="Utility",
               aliases=["pingmsg" "pingmessage"])
@@ -176,7 +175,7 @@ class Utility(commands.Cog):
                   desc="Show bot latency (or ping)", 
                   syntax="ping",
                   cog="Utility")
-    async def ping(ctx):
+    async def ping(self, ctx):
         await ctx.send(
             f'Ping of main instance is `{round(client.latency * 1000)}ms` 🏓')
 

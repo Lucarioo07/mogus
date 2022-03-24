@@ -11,8 +11,8 @@ class Test(commands.Cog):
         self.client = client
     def cog_check(self, ctx):
         return is_owner(ctx.author)
-    
+            
 
-
+            
 def setup(client):
     client.add_cog(Test(client))

@@ -22,7 +22,7 @@ class Boiz(commands.Cog):
     
     @commands.command(aliases=["cc"])
     @command_help(name="CustomChannel", 
-                  desc="Creates a custom channel with full perms for yourself. Limited to one. If no name is specified it'll give you some boring                              name", 
+                  desc="Creates a custom channel with full perms for yourself. Limited to one. If no name is specified it'll give you some boring name", 
                   syntax="cc [name]",
                   cog="Da Boiz",
                   aliases=["cc"])

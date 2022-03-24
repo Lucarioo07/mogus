@@ -1,8 +1,4 @@
-import discord
 from discord.ext import commands
-from replit import db
-import os
-from utils import *
 
 
 class UserBanned(commands.CheckFailure):

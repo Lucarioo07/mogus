@@ -10,29 +10,8 @@ class Fun(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-        
     cog_help(name="Fun", desc="Commands for fun!") 
     
-    # Events
-
-    @commands.Cog.listener()
-    async def on_message_delete(self, ctx):
-
-        snipe_target = db["snipe_target"]
-        if ctx.author.id in snipe_target:
-            send_webhook(ctx.content, f"{ctx.author.name} (snipe)",
-                         ctx.author.avatar_url, await
-                         fetch_webhook(ctx.channel))
-
-    @commands.Cog.listener()
-    async def on_message_edit(self, ctx, after):
-
-        snipe_target = db["snipe_target"]
-        if ctx.author.id in snipe_target:
-            send = f"> {after.content}\n **Before:** `{ctx.content}`"
-            send_webhook(send, f"{ctx.author.name} (editsnipe)",
-                         ctx.author.avatar_url, await
-                         fetch_webhook(ctx.channel))
 
     # Commands
 
@@ -44,7 +23,7 @@ class Fun(commands.Cog):
                   cog="Fun")
     async def frame(self, ctx, user: discord.Member, *, content):
 
-        if is_owner(ctx.author.id) or (user.id not in safe):
+        if is_owner(ctx.author.id) or (user.id not in [client.owner.id, client.user.id]):
             frame(content, user, await fetch_webhook(ctx.channel))
         else:
             frame(content, ctx.author, await fetch_webhook(ctx.channel))
